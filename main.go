@@ -12,6 +12,7 @@ import (
 	// "time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler"
 )
 
 // 参考：https://github.com/bwmarrin/discordgo/blob/master/examples/slash_commands/main.go
@@ -226,16 +227,7 @@ var (
 	}
 
 	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"createHandsUpCommands": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-			msgContent := i.ApplicationCommandData().Resolved.Messages[i.ApplicationCommandData().TargetID].Content
-			s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-				Type: discordgo.InteractionResponseChannelMessageWithSource,
-				Data: &discordgo.InteractionResponseData{
-					Content: msgContent,
-					Flags: discordgo.MessageFlagsEphemeral,
-				},
-			})
-		},
+		"createHandsUpCommands": handler.CreateHandsUpCommands,
 		// "basic-command-with-files": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
