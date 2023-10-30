@@ -26,7 +26,14 @@ var (
 
 var s *discordgo.Session
 
-func init() { flag.Parse() }
+func init() { 
+	flag.Parse()
+
+	EnvBotToken := os.Getenv("BOT_TOKEN")
+	if EnvBotToken != "" {
+		*BotToken = EnvBotToken
+	}
+}
 
 func init() {
 	var err error
