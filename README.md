@@ -18,3 +18,17 @@ go test ./...
 go run main.go -guild GUILD_ID -token DISCORD_BOT_TOKEN
 ```
 
+### デプロイ
+
+#### Fly.io
+
+fly.tomlの用意
+
+```
+app = "YOUR APP NAME"
+kill_signal = "SIGINT"
+kill_timeout = 5
+processes = []
+
+[env]
+```
