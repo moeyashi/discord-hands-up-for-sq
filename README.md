@@ -33,10 +33,5 @@ go run main.go -guild GUILD_ID
 fly.tomlの用意
 
 ```
-app = "YOUR APP NAME"
-kill_signal = "SIGINT"
-kill_timeout = 5
-processes = []
-
-[env]
+flyctl deploy -a YOUR_APP_NAME
 ```
