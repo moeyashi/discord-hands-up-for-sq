@@ -6,6 +6,13 @@
 
 ## 開発
 
+### 準備
+
+```bash
+npm install -g firebase-tools
+firebase login --no-localhost
+```
+
 ### 単体テスト
 
 ```bash
@@ -15,6 +22,8 @@ go test ./...
 ### テスト実行
 
 ```bash
+firebase emulators:start
+# 別ターミナル
 go run main.go -guild GUILD_ID -token DISCORD_BOT_TOKEN
 ```
 
