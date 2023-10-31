@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"cloud.google.com/go/firestore"
+	"google.golang.org/api/option"
 )
 
 type firestoreRepository struct {
@@ -14,7 +15,14 @@ type firestoreRepository struct {
 
 func New(ctx context.Context) (Repository, error) {
 	projectID := os.Getenv("FIREBASE_PROJECT_ID")
-	client, err := firestore.NewClient(ctx, projectID)
+	var client *firestore.Client
+	credentialJSON := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
+	var err error
+	if credentialJSON != "" {
+		client, err = firestore.NewClient(ctx, projectID, option.WithCredentialsJSON([]byte(credentialJSON)))
+	} else {
+		client, err = firestore.NewClient(ctx, projectID)
+	}
 	if err != nil {
 		return nil, err
 	}
