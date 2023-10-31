@@ -6,23 +6,18 @@
 
 ## 開発
 
-### 準備
-
-```bash
-npm install -g firebase-tools
-firebase login --no-localhost
-```
-
 ### 単体テスト
 
 ```bash
+gcloud emulators firestore start --host-port=localhost:5000
+# 別ターミナル
 go test ./...
 ```
 
 ### テスト実行
 
 ```bash
-firebase emulators:start
+gcloud emulators firestore start --host-port=localhost:5000
 # 別ターミナル
 go run main.go -guild GUILD_ID -token DISCORD_BOT_TOKEN
 ```

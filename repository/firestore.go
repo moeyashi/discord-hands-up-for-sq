@@ -20,10 +20,19 @@ func New(ctx context.Context) (*firestoreRepository, error) {
 	return &firestoreRepository{client: client}, nil
 }
 
-func (r *firestoreRepository) GetVersion(ctx context.Context) (string, error) {
-	versions, err := r.client.Collection("v").OrderBy("id", firestore.Desc).Limit(1).Documents(ctx).GetAll()
+type version struct {
+	Version    int64  `firestore:"version"`
+}
+
+func (r *firestoreRepository) GetVersion(ctx context.Context) (*version, error) {
+	versions, err := r.client.Collection("v").OrderBy("version", firestore.Desc).Limit(1).Documents(ctx).GetAll()
 	if err != nil || len(versions) == 0 {
-		return "", err
+		return nil, err
 	}
-	return versions[0].Ref.ID, nil
+	var v version
+	err = versions[0].DataTo(&v)
+	if err != nil {
+		return nil, err
+	}
+	return &v, nil
 }
