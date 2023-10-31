@@ -19,7 +19,11 @@ go test ./...
 ```bash
 gcloud emulators firestore start --host-port=localhost:5000
 # 別ターミナル
-go run main.go -guild GUILD_ID -token DISCORD_BOT_TOKEN
+## 環境変数の設定 (windowsの場合)
+$env:BOT_TOKEN="[YOUR BOT TOKEN]"
+$env:FIREBASE_PROJECT_ID="test"
+$env:FIRESTORE_EMULATOR_HOST="localhost:5000"
+go run main.go -guild GUILD_ID
 ```
 
 ### デプロイ

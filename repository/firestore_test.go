@@ -5,6 +5,8 @@ import (
 	"net/http"
 	"os"
 	"testing"
+
+	"cloud.google.com/go/firestore"
 )
 
 const emulatorHost = "localhost:5000"
@@ -35,16 +37,21 @@ func resetEmulator(t *testing.T) {
 func TestGetVersion(t *testing.T) {
 	resetEmulator(t)
 	ctx := context.Background()
-	repo, err := New(ctx)
+	client, err := firestore.NewClient(ctx, projectID)
 	if err != nil {
 		t.Fatal(err)
 	}
 
-	_, err = repo.client.Collection("v").Doc("1").Create(ctx, map[string]interface{}{"version": 1})
+	_, err = client.Collection("v").Doc("1").Create(ctx, map[string]interface{}{"version": 1})
 	if err != nil {
 		t.Fatal(err)
 	}
-	_, err = repo.client.Collection("v").Doc("2").Create(ctx, map[string]interface{}{"version": 2})
+	_, err = client.Collection("v").Doc("2").Create(ctx, map[string]interface{}{"version": 2})
+	if err != nil {
+		t.Fatal(err)
+	}
+	
+	repo, err := New(ctx)
 	if err != nil {
 		t.Fatal(err)
 	}

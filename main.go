@@ -2,7 +2,9 @@ package main
 
 import (
 	// "errors"
+	"context"
 	"flag"
+
 	// "fmt"
 	"log"
 	"os"
@@ -13,6 +15,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/moeyashi/discord-hands-up-for-sq/handler"
+	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
 // 参考：https://github.com/bwmarrin/discordgo/blob/master/examples/slash_commands/main.go
@@ -50,12 +53,17 @@ var (
 
 	commands = []*discordgo.ApplicationCommand{
 		{
-			Name: "createHandsUpCommands",
+			Name: "hands-upコマンドに変換",
 			// All commands and options must have a description
 			// Commands/options without description will fail the registration
 			// of the command.
 			// Description: "create hands-up commands",
 			Type: discordgo.MessageApplicationCommand,
+		},
+		{
+			Name: "version",
+			Description: "バージョンを確認",
+			Type: discordgo.ChatApplicationCommand,
 		},
 		// {
 		// 	Name:                     "permission-overview",
@@ -233,8 +241,9 @@ var (
 		// },
 	}
 
-	commandHandlers = map[string]func(s *discordgo.Session, i *discordgo.InteractionCreate){
-		"createHandsUpCommands": handler.CreateHandsUpCommands,
+	commandHandlers = map[string]func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository){
+		"hands-upコマンドに変換": handler.CreateHandsUpCommands,
+		"version": handler.GetVersion,
 		// "basic-command-with-files": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -544,7 +553,13 @@ var (
 func init() {
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-			h(s, i)
+			ctx := context.Background()
+			repository, err := repository.New(ctx)
+			if err != nil {
+				log.Fatalf("Cannot create repository: %v", err)
+				return
+			}
+			h(ctx, s, i, repository)
 		}
 	})
 }
