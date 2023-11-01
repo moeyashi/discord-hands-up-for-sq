@@ -9,10 +9,10 @@ import (
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
-func CreateHandsUpCommands(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
+func CreateSetCommands(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
 	msgContent := i.ApplicationCommandData().Resolved.Messages[i.ApplicationCommandData().TargetID].Content
-	commands := createHandsUpCommandsInFuture(msgContent, time.Now())
-	content := "今日明日開催のSQイベントが見つかりませんでした。"
+	commands := createSetCommandsInFuture(msgContent, time.Now())
+	content := "現在以降開催のSQイベントが見つかりませんでした。"
 	if len(commands) > 0 {
 		content = strings.Join(commands, "\n")
 	}

@@ -53,11 +53,11 @@ var (
 
 	commands = []*discordgo.ApplicationCommand{
 		{
-			Name: "hands-upコマンドに変換",
-			// All commands and options must have a description
-			// Commands/options without description will fail the registration
-			// of the command.
-			// Description: "create hands-up commands",
+			Name: "setコマンドに変換",
+			Type: discordgo.MessageApplicationCommand,
+		},
+		{
+			Name: "outコマンドに変換",
 			Type: discordgo.MessageApplicationCommand,
 		},
 		{
@@ -242,7 +242,8 @@ var (
 	}
 
 	commandHandlers = map[string]func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository){
-		"hands-upコマンドに変換": handler.CreateHandsUpCommands,
+		"setコマンドに変換": handler.CreateSetCommands,
+		"outコマンドに変換": handler.CreateOutCommands,
 		"version": handler.GetVersion,
 		// "basic-command-with-files": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{

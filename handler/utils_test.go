@@ -3,6 +3,8 @@ package handler
 import (
 	"testing"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 // 2023-10-24 ~ 2023-10-29 のSQイベント
@@ -24,9 +26,9 @@ import (
 // #1774 2v2: 2023年10月29日 日曜日 09:00
 var sampleSQInfo = "@everyone last SQ events of S9:\n`#1760` **2v2:** <t:1698141600:F>\n`#1761` **3v3:** <t:1698170400:F>\n`#1762` **2v2:** <t:1698195600:F>\n`#1763` **2v2:** <t:1698242400:F>\n`#1764` **2v2:** <t:1698267600:F>\n`#1765` **6v6:** <t:1698285600:F>\n`#1766` **3v3:** <t:1698321600:F>\n`#1767` **2v2:** <t:1698343200:F>\n`#1768` **3v3:** <t:1698375600:F>\n`#1769` **4v4:** <t:1698415200:F>\n`#1770` **3v3:** <t:1698440400:F>\n`#1771` **6v6:** <t:1698462000:F>\n`#1772` **2v2:** <t:1698487200:F>\n`#1773` **2v2:** <t:1698516000:F>\n`#1774` **2v2:** <t:1698537600:F>"
 
-func Test_createHandsUpCommandsInFuture_今日明日のイベントが取得できる(t *testing.T) {
+func Test_createSetCommandsInFuture_今日明日のイベントが取得できる(t *testing.T) {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
-	result := createHandsUpCommandsInFuture(sampleSQInfo, time.Date(2023, 10, 27, 0, 0, 0, 0, jst))
+	result := createSetCommandsInFuture(sampleSQInfo, time.Date(2023, 10, 27, 0, 0, 0, 0, jst))
 	expected := []string{
 		"/hands-up set hour:27日03:00 2v2 number:12",
 		"/hands-up set hour:27日12:00 3v3 number:12",
@@ -47,7 +49,7 @@ func Test_createHandsUpCommandsInFuture_今日明日のイベントが取得で�
 	}
 }
 
-func Test_createHandsUpCommandsInFuture_未来のイベントがない場合_空のsliceを返却する(t *testing.T) {
+func Test_createSetCommandsInFuture_未来のイベントがない場合_空のsliceを返却する(t *testing.T) {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	tests := []struct {
 		name string
@@ -64,11 +66,39 @@ func Test_createHandsUpCommandsInFuture_未来のイベントがない場合_空
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			result := createHandsUpCommandsInFuture(sampleSQInfo, tt.now)
+			result := createSetCommandsInFuture(sampleSQInfo, tt.now)
 			expected := []string{}
 			if len(result) != 0 {
 				t.Errorf("len(result) = %d, want %d", len(result), len(expected))
 			}
 		})
+	}
+}
+
+func Test_createOutCommandsForAll(t *testing.T) {
+	sampleHandsUpNow := []discordgo.MessageComponent{
+		&discordgo.ActionsRow{
+			Components: []discordgo.MessageComponent{
+				&discordgo.Button{
+					Label: "27日03:00",
+				},
+				&discordgo.Button{
+					Label: "27日12:00",
+				},
+			},
+		},
+	}
+	actual := createOutCommandsForAll(sampleHandsUpNow)
+	expected := []string{
+		"/hands-up out hour:27日03:00",
+		"/hands-up out hour:27日12:00",
+	}
+	if len(actual) != len(expected) {
+		t.Errorf("len(actual) = %d, want %d", len(actual), len(expected))
+	}
+	for i, v := range actual {
+		if v != expected[i] {
+			t.Errorf("actual[%d] = %s, want %s", i, v, expected[i])
+		}
 	}
 }
