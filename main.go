@@ -53,6 +53,15 @@ var (
 
 	commands = []*discordgo.ApplicationCommand{
 		{
+			Name: "set",
+			Type: discordgo.MessageApplicationCommand,
+		},
+		{
+			Name: "list",
+			Type: discordgo.ChatApplicationCommand,
+			Description: "SQイベントを取得します",
+		},
+		{
 			Name: "setコマンドに変換",
 			Type: discordgo.MessageApplicationCommand,
 		},
@@ -242,6 +251,8 @@ var (
 	}
 
 	commandHandlers = map[string]func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository){
+		"set": handler.SetSQ,
+		"list": handler.ListSQ,
 		"setコマンドに変換": handler.CreateSetCommands,
 		"outコマンドに変換": handler.CreateOutCommands,
 		"version": handler.GetVersion,
