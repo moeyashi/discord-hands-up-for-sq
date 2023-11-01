@@ -34,4 +34,7 @@ fly.tomlの用意
 
 ```
 flyctl deploy -a YOUR_APP_NAME
+# wndowsだと上手く動かない？ な場合
+#   `Status: Image is up to date for gcr.io/paketo-buildpacks/go:latest`で止まる
+flyctl deploy -a YOUR_APP_NAME --local-only
 ```
