@@ -63,23 +63,19 @@ func (r *firestoreRepository) PutSQList(ctx context.Context, guildID string, sqL
 	if err != nil {
 		return err
 	}
-	log.Println("guild.SQList:", guild.SQList)
 
 	addedSQTitle := []string{}
 	newSQList := []SQ{}
 	// すでにfirestoreにあるものはそのまま残す
 	for _, sq := range guild.SQList {
-		log.Println("sq.Title:", sq.Title)
 		if slices.Contains(sqList, sq.Title) {
 			newSQList = append(newSQList, sq)
 			addedSQTitle = append(addedSQTitle, sq.Title)
 		}
 	}
-	log.Println("addedSQTitle:", addedSQTitle)
 	// 新規追加
 	for _, title := range sqList {
 		if !slices.Contains(addedSQTitle, title) {
-			log.Println("title:", title)
 			newSQList = append(newSQList, SQ{Title: title})
 		}
 	}
@@ -120,10 +116,8 @@ func (r *firestoreRepository) getGuildOrCreate(ctx context.Context, guildID stri
 
 	existsGuild := &Guild{}
 	if err := guild.DataTo(existsGuild); err != nil {
-		log.Println(err)
 		return nil, err
 	}
-	log.Println("existsGuild:", existsGuild)
 
 	return existsGuild, nil
 }
