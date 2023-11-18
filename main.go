@@ -29,7 +29,7 @@ var (
 
 var s *discordgo.Session
 
-func init() { 
+func init() {
 	flag.Parse()
 
 	EnvBotToken := os.Getenv("BOT_TOKEN")
@@ -53,13 +53,24 @@ var (
 
 	commands = []*discordgo.ApplicationCommand{
 		{
-			Name: "set",
-			Type: discordgo.MessageApplicationCommand,
+			Name:        "husq",
+			Description: "Hands up for SQ",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "list",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "SQイベントを取得します",
+				},
+				{
+					Name:        "version",
+					Description: "バージョンを確認",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+				},
+			},
 		},
 		{
-			Name: "list",
-			Type: discordgo.ChatApplicationCommand,
-			Description: "SQイベントを取得します",
+			Name: "husq set",
+			Type: discordgo.MessageApplicationCommand,
 		},
 		{
 			Name: "setコマンドに変換",
@@ -68,11 +79,6 @@ var (
 		{
 			Name: "outコマンドに変換",
 			Type: discordgo.MessageApplicationCommand,
-		},
-		{
-			Name: "version",
-			Description: "バージョンを確認",
-			Type: discordgo.ChatApplicationCommand,
 		},
 		// {
 		// 	Name:                     "permission-overview",
@@ -251,11 +257,20 @@ var (
 	}
 
 	commandHandlers = map[string]func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository){
-		"set": handler.SetSQ,
-		"list": handler.ListSQ,
+		"husq set": handler.SetSQ,
+		"husq": func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
+			options := i.ApplicationCommandData().Options
+			switch options[0].Name {
+			case "list":
+				handler.ListSQ(ctx, s, i, repository)
+				return
+			case "version":
+				handler.GetVersion(ctx, s, i, repository)
+				return
+			}
+		},
 		"setコマンドに変換": handler.CreateSetCommands,
 		"outコマンドに変換": handler.CreateOutCommands,
-		"version": handler.GetVersion,
 		// "basic-command-with-files": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
