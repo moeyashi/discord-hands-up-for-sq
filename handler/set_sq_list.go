@@ -10,15 +10,26 @@ import (
 )
 
 func SetSQ(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
-	guildID := i.GuildID
+	guild, err := repository.GetGuild(ctx, i.GuildID)
+	if err != nil {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Flags:   discordgo.MessageFlagsEphemeral,
+				Content: fmt.Sprint(err),
+			},
+		})
+		return
+	}
+
 	msgContent := i.ApplicationCommandData().Resolved.Messages[i.ApplicationCommandData().TargetID].Content
 	sqList := sqListInFuture(msgContent, time.Now())
-	if err:= repository.PutSQList(ctx, guildID, sqList); err != nil {
+	if err := repository.PutSQList(ctx, guild, sqList); err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
 				Content: fmt.Sprint(err),
-				Flags: discordgo.MessageFlagsEphemeral,
+				Flags:   discordgo.MessageFlagsEphemeral,
 			},
 		})
 		return
@@ -27,7 +38,7 @@ func SetSQ(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCr
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Content: "SQリストを更新しました",
-			Flags: discordgo.MessageFlagsEphemeral,
+			Flags:   discordgo.MessageFlagsEphemeral,
 		},
 	})
 }

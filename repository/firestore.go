@@ -58,12 +58,19 @@ func (r *firestoreRepository) GetVersion(ctx context.Context) (*version, error) 
 	return &v, nil
 }
 
-func (r *firestoreRepository) PutSQList(ctx context.Context, guildID string, sqList []string) error {
+func (r *firestoreRepository) GetGuild(ctx context.Context, guildID string) (*Guild, error) {
 	guild, err := r.getGuildOrCreate(ctx, guildID)
 	if err != nil {
-		return err
+		return nil, err
 	}
+	return guild, nil
+}
 
+func (r *firestoreRepository) GetSQList(ctx context.Context, guild *Guild) ([]SQ, error) {
+	return guild.SQList, nil
+}
+
+func (r *firestoreRepository) PutSQList(ctx context.Context, guild *Guild, sqList []string) error {
 	addedSQTitle := []string{}
 	newSQList := []SQ{}
 	// すでにfirestoreにあるものはそのまま残す
@@ -81,16 +88,28 @@ func (r *firestoreRepository) PutSQList(ctx context.Context, guildID string, sqL
 	}
 
 	guild.SQList = newSQList
-	_, err = r.getGuildDocRef(guildID).Set(ctx, guild)
+	_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
 	return err
 }
 
-func (r *firestoreRepository) GetGuild(ctx context.Context, guildID string) (*Guild, error) {
-	guild, err := r.getGuildOrCreate(ctx, guildID)
-	if err != nil {
-		return nil, err
+func (r *firestoreRepository) GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error) {
+	for _, sq := range guild.SQList {
+		if sq.Title == sqTitle {
+			return sq.Members, nil
+		}
 	}
-	return guild, nil
+	return nil, errors.New("not found")
+}
+
+func (r *firestoreRepository) PutSQMembers(ctx context.Context, guild *Guild, sqTitle string, members []Member) error {
+	for i, sq := range guild.SQList {
+		if sq.Title == sqTitle {
+			guild.SQList[i].Members = members
+			_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
+			return err
+		}
+	}
+	return errors.New("not found")
 }
 
 func (r *firestoreRepository) getGuildDocRef(guildID string) *firestore.DocumentRef {
@@ -103,7 +122,7 @@ func (r *firestoreRepository) getGuildOrCreate(ctx context.Context, guildID stri
 	if err != nil {
 		log.Println("create new guild")
 		if status.Code(err) == codes.NotFound {
-			newGuild := Guild{}
+			newGuild := Guild{ID: guildID}
 			_, err := ref.Create(ctx, newGuild)
 			if err != nil {
 				return nil, err
@@ -120,32 +139,4 @@ func (r *firestoreRepository) getGuildOrCreate(ctx context.Context, guildID stri
 	}
 
 	return existsGuild, nil
-}
-
-func (r *firestoreRepository) GetSQMembers(ctx context.Context, guildID string, sqTitle string) ([]Member, error) {
-	guild, err := r.getGuildOrCreate(ctx, guildID)
-	if err != nil {
-		return nil, err
-	}
-	for _, sq := range guild.SQList {
-		if sq.Title == sqTitle {
-			return sq.Members, nil
-		}
-	}
-	return nil, errors.New("not found")
-}
-
-func (r *firestoreRepository) PutSQMembers(ctx context.Context, guildID string, sqTitle string, members []Member) error {
-	guild, err := r.getGuildOrCreate(ctx, guildID)
-	if err != nil {
-		return err
-	}
-	for i, sq := range guild.SQList {
-		if sq.Title == sqTitle {
-			guild.SQList[i].Members = members
-			_, err := r.getGuildDocRef(guildID).Set(ctx, guild)
-			return err
-		}
-	}
-	return errors.New("not found")
 }

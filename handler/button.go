@@ -23,11 +23,22 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 		return
 	}
 
-	guildID := i.GuildID
+	guild, err := repository.GetGuild(ctx, i.GuildID)
+	if err != nil {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Flags:   discordgo.MessageFlagsEphemeral,
+				Content: fmt.Sprint(err),
+			},
+		})
+		return
+	}
+
 	sqTitle := strings.Split(messageComponentData.CustomID, "button_")[1]
 
 	// SQ Member の取得
-	members, err := repository.GetSQMembers(ctx, guildID, sqTitle)
+	members, err := repository.GetSQMembers(ctx, guild, sqTitle)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
@@ -58,7 +69,7 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 		})
 		responseMessage = fmt.Sprintf("%s を %s に追加しました。", i.Member.User.Username, sqTitle)
 	}
-	if err := repository.PutSQMembers(ctx, guildID, sqTitle, members); err != nil {
+	if err := repository.PutSQMembers(ctx, guild, sqTitle, members); err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
 			Data: &discordgo.InteractionResponseData{
@@ -70,7 +81,7 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 	}
 
 	// メッセージの作成
-	res, err := createSQListInteractionResponse(ctx, guildID, repository)
+	res, err := createSQListInteractionResponse(ctx, guild.SQList, repository)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

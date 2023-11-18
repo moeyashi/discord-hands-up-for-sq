@@ -4,10 +4,11 @@ import "context"
 
 type Repository interface {
 	GetVersion(ctx context.Context) (*version, error)
-	PutSQList(ctx context.Context, guildID string, sqList []string) error
 	GetGuild(ctx context.Context, guildID string) (*Guild, error)
-	GetSQMembers(ctx context.Context, guildID string, sqTitle string) ([]Member, error)
-	PutSQMembers(ctx context.Context, guildID string, sqTitle string, members []Member) error
+	GetSQList(ctx context.Context, guild *Guild) ([]SQ, error)
+	PutSQList(ctx context.Context, guild *Guild, sqList []string) error
+	GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error)
+	PutSQMembers(ctx context.Context, guild *Guild, sqTitle string, members []Member) error
 }
 
 type MemberTypes int
@@ -29,5 +30,6 @@ type SQ struct {
 }
 
 type Guild struct {
-	SQList []SQ `firestore:"sqList"`
+	ID     string `firestore:"id"`
+	SQList []SQ   `firestore:"sqList"`
 }

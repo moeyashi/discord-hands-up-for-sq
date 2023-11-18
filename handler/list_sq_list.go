@@ -9,8 +9,19 @@ import (
 )
 
 func ListSQ(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
-	guildID := i.GuildID
-	res, err := createSQListInteractionResponse(ctx, guildID, repository)
+	guild, err := repository.GetGuild(ctx, i.GuildID)
+	if err != nil {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Flags:   discordgo.MessageFlagsEphemeral,
+				Content: fmt.Sprint(err),
+			},
+		})
+		return
+	}
+
+	res, err := createSQListInteractionResponse(ctx, guild.SQList, repository)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

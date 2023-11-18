@@ -97,18 +97,10 @@ func createOutCommandsForAll(handsUpNow []discordgo.MessageComponent) []string {
 	return commands
 }
 
-func createSQListInteractionResponse(ctx context.Context, guildID string, repository repository.Repository) (*discordgo.InteractionResponse, error) {
-	guild, err := repository.GetGuild(ctx, guildID)
-	if err != nil {
-		return nil, err
-	}
-	if len(guild.SQList) == 0 {
-		return nil, fmt.Errorf("SQが登録されていません。")
-	}
-
+func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ, repository repository.Repository) (*discordgo.InteractionResponse, error) {
 	embedFields := []*discordgo.MessageEmbedField{}
 	components := []discordgo.MessageComponent{}
-	for _, sq := range guild.SQList {
+	for _, sq := range sqList {
 		members := sq.Members
 		embedFieldsValue := "なし"
 		userNames := []string{}
@@ -123,23 +115,32 @@ func createSQListInteractionResponse(ctx context.Context, guildID string, reposi
 			Name:  sq.Title,
 			Value: embedFieldsValue,
 		})
-		if len(components) < 5 {
-			components = append(components, discordgo.Button{
-				CustomID: "button_" + sq.Title,
-				Label:    sq.Title,
-				Style:    discordgo.DangerButton,
-			})
-		}
+		components = append(components, discordgo.Button{
+			CustomID: "button_" + sq.Title,
+			Label:    sq.Title,
+			Style:    discordgo.SecondaryButton,
+		})
 	}
+
+	// componentsが5つまでしか入らないため、5つごとにRowを分ける
+	actionsRows := []discordgo.ActionsRow{}
+	for index, component := range components {
+		if index%5 == 0 {
+			actionsRows = append(actionsRows, discordgo.ActionsRow{})
+		}
+		actionsRows[len(actionsRows)-1].Components = append(actionsRows[len(actionsRows)-1].Components, component)
+	}
+
+	rows := []discordgo.MessageComponent{}
+	for _, actionsRow := range actionsRows {
+		rows = append(rows, actionsRow)
+	}
+
 	return &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds: []*discordgo.MessageEmbed{{Fields: embedFields}},
-			Components: []discordgo.MessageComponent{
-				discordgo.ActionsRow{
-					Components: components,
-				},
-			},
+			Embeds:     []*discordgo.MessageEmbed{{Fields: embedFields}},
+			Components: rows,
 		},
 	}, nil
 }
