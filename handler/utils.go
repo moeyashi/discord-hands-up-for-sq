@@ -1,14 +1,17 @@
 package handler
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"regexp"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
 func sqListInFuture(sqInfo string, now time.Time) []string {
@@ -92,4 +95,51 @@ func createOutCommandsForAll(handsUpNow []discordgo.MessageComponent) []string {
 		}
 	}
 	return commands
+}
+
+func createSQListInteractionResponse(ctx context.Context, guildID string, repository repository.Repository) (*discordgo.InteractionResponse, error) {
+	guild, err := repository.GetGuild(ctx, guildID)
+	if err != nil {
+		return nil, err
+	}
+	if len(guild.SQList) == 0 {
+		return nil, fmt.Errorf("SQが登録されていません。")
+	}
+
+	embedFields := []*discordgo.MessageEmbedField{}
+	components := []discordgo.MessageComponent{}
+	for _, sq := range guild.SQList {
+		members := sq.Members
+		embedFieldsValue := "なし"
+		userNames := []string{}
+		for _, member := range members {
+			userNames = append(userNames, member.UserName)
+		}
+		if len(userNames) > 0 {
+			embedFieldsValue = strings.Join(userNames, ",")
+		}
+
+		embedFields = append(embedFields, &discordgo.MessageEmbedField{
+			Name:  sq.Title,
+			Value: embedFieldsValue,
+		})
+		if len(components) < 5 {
+			components = append(components, discordgo.Button{
+				CustomID: "button_" + sq.Title,
+				Label:    sq.Title,
+				Style:    discordgo.DangerButton,
+			})
+		}
+	}
+	return &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseChannelMessageWithSource,
+		Data: &discordgo.InteractionResponseData{
+			Embeds: []*discordgo.MessageEmbed{{Fields: embedFields}},
+			Components: []discordgo.MessageComponent{
+				discordgo.ActionsRow{
+					Components: components,
+				},
+			},
+		},
+	}, nil
 }

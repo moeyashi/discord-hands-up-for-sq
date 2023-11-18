@@ -4,6 +4,7 @@ import (
 	// "errors"
 	"context"
 	"flag"
+	"strings"
 
 	// "fmt"
 	"log"
@@ -188,43 +189,6 @@ var (
 		// 			Name:        "role-option",
 		// 			Description: "Role option",
 		// 			Required:    false,
-		// 		},
-		// 	},
-		// },
-		// {
-		// 	Name:        "subcommands",
-		// 	Description: "Subcommands and command groups example",
-		// 	Options: []*discordgo.ApplicationCommandOption{
-		// 		// When a command has subcommands/subcommand groups
-		// 		// It must not have top-level options, they aren't accesible in the UI
-		// 		// in this case (at least not yet), so if a command has
-		// 		// subcommands/subcommand any groups registering top-level options
-		// 		// will cause the registration of the command to fail
-
-		// 		{
-		// 			Name:        "subcommand-group",
-		// 			Description: "Subcommands group",
-		// 			Options: []*discordgo.ApplicationCommandOption{
-		// 				// Also, subcommand groups aren't capable of
-		// 				// containing options, by the name of them, you can see
-		// 				// they can only contain subcommands
-		// 				{
-		// 					Name:        "nested-subcommand",
-		// 					Description: "Nested subcommand",
-		// 					Type:        discordgo.ApplicationCommandOptionSubCommand,
-		// 				},
-		// 			},
-		// 			Type: discordgo.ApplicationCommandOptionSubCommandGroup,
-		// 		},
-		// 		// Also, you can create both subcommand groups and subcommands
-		// 		// in the command at the same time. But, there's some limits to
-		// 		// nesting, count of subcommands (top level and nested) and options.
-		// 		// Read the intro of slash-commands docs on Discord dev portal
-		// 		// to get more information
-		// 		{
-		// 			Name:        "subcommand",
-		// 			Description: "Top-level subcommand",
-		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
 		// 		},
 		// 	},
 		// },
@@ -448,33 +412,6 @@ var (
 		// 		},
 		// 	})
 		// },
-		// "subcommands": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		// 	options := i.ApplicationCommandData().Options
-		// 	content := ""
-
-		// 	// As you can see, names of subcommands (nested, top-level)
-		// 	// and subcommand groups are provided through the arguments.
-		// 	switch options[0].Name {
-		// 	case "subcommand":
-		// 		content = "The top-level subcommand is executed. Now try to execute the nested one."
-		// 	case "subcommand-group":
-		// 		options = options[0].Options
-		// 		switch options[0].Name {
-		// 		case "nested-subcommand":
-		// 			content = "Nice, now you know how to execute nested commands too"
-		// 		default:
-		// 			content = "Oops, something went wrong.\n" +
-		// 				"Hol' up, you aren't supposed to see this message."
-		// 		}
-		// 	}
-
-		// 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
-		// 		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		// 		Data: &discordgo.InteractionResponseData{
-		// 			Content: content,
-		// 		},
-		// 	})
-		// },
 		// "responses": func(s *discordgo.Session, i *discordgo.InteractionCreate) {
 		// 	// Responses to a command are very important.
 		// 	// First of all, because you need to react to the interaction
@@ -579,14 +516,21 @@ var (
 
 func init() {
 	s.AddHandler(func(s *discordgo.Session, i *discordgo.InteractionCreate) {
-		if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
-			ctx := context.Background()
-			repository, err := repository.New(ctx)
-			if err != nil {
-				log.Fatalf("Cannot create repository: %v", err)
-				return
+		ctx := context.Background()
+		repository, err := repository.New(ctx)
+		if err != nil {
+			log.Fatalf("Cannot create repository: %v", err)
+			return
+		}
+		switch i.Type {
+		case discordgo.InteractionApplicationCommand:
+			if h, ok := commandHandlers[i.ApplicationCommandData().Name]; ok {
+				h(ctx, s, i, repository)
 			}
-			h(ctx, s, i, repository)
+		case discordgo.InteractionMessageComponent:
+			if strings.HasPrefix(i.MessageComponentData().CustomID, "button_") {
+				handler.HandleClick(ctx, s, i, repository)
+			}
 		}
 	})
 }

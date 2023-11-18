@@ -39,7 +39,7 @@ func New(ctx context.Context) (Repository, error) {
 }
 
 type version struct {
-	Version    int64  `firestore:"version"`
+	Version int64 `firestore:"version"`
 }
 
 func (r *firestoreRepository) GetVersion(ctx context.Context) (*version, error) {
@@ -79,7 +79,7 @@ func (r *firestoreRepository) PutSQList(ctx context.Context, guildID string, sqL
 			newSQList = append(newSQList, SQ{Title: title})
 		}
 	}
-	
+
 	guild.SQList = newSQList
 	_, err = r.getGuildDocRef(guildID).Set(ctx, guild)
 	return err
@@ -120,4 +120,32 @@ func (r *firestoreRepository) getGuildOrCreate(ctx context.Context, guildID stri
 	}
 
 	return existsGuild, nil
+}
+
+func (r *firestoreRepository) GetSQMembers(ctx context.Context, guildID string, sqTitle string) ([]Member, error) {
+	guild, err := r.getGuildOrCreate(ctx, guildID)
+	if err != nil {
+		return nil, err
+	}
+	for _, sq := range guild.SQList {
+		if sq.Title == sqTitle {
+			return sq.Members, nil
+		}
+	}
+	return nil, errors.New("not found")
+}
+
+func (r *firestoreRepository) PutSQMembers(ctx context.Context, guildID string, sqTitle string, members []Member) error {
+	guild, err := r.getGuildOrCreate(ctx, guildID)
+	if err != nil {
+		return err
+	}
+	for i, sq := range guild.SQList {
+		if sq.Title == sqTitle {
+			guild.SQList[i].Members = members
+			_, err := r.getGuildDocRef(guildID).Set(ctx, guild)
+			return err
+		}
+	}
+	return errors.New("not found")
 }
