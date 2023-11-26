@@ -63,6 +63,21 @@ var (
 					Description: "SQイベントを取得します",
 				},
 				{
+					Name:        "can",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "SQイベントに参加します",
+				},
+				// {
+				// 	Name:        "temp",
+				// 	Type:        discordgo.ApplicationCommandOptionSubCommand,
+				// 	Description: "SQイベントに仮参加します",
+				// },
+				// {
+				// 	Name:        "sub",
+				// 	Type:        discordgo.ApplicationCommandOptionSubCommand,
+				// 	Description: "SQイベントに補欠参加します",
+				// },
+				{
 					Name:        "version",
 					Description: "バージョンを確認",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
@@ -228,6 +243,15 @@ var (
 			case "list":
 				handler.ListSQ(ctx, s, i, repository)
 				return
+			case "can":
+				handler.CanHUSQ(ctx, s, i, repository)
+				return
+			// case "temp":
+			// 	handler.
+			// 	return
+			// case "sub":
+			// 	handler.
+			// 	return
 			case "version":
 				handler.GetVersion(ctx, s, i, repository)
 				return
@@ -528,7 +552,10 @@ func init() {
 				h(ctx, s, i, repository)
 			}
 		case discordgo.InteractionMessageComponent:
-			if strings.HasPrefix(i.MessageComponentData().CustomID, "button_") {
+			customID := i.MessageComponentData().CustomID
+			if customID == string(handler.SQListSelectCustomIDCan) {
+				handler.HandleSelectCan(ctx, s, i, repository)
+			} else if strings.HasPrefix(customID, "button_") {
 				handler.HandleClick(ctx, s, i, repository)
 			}
 		}

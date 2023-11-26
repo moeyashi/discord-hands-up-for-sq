@@ -145,6 +145,35 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 	}, nil
 }
 
+type SQListSelectCustomID string
+
+const (
+	SQListSelectCustomIDCan SQListSelectCustomID = "can_select"
+)
+
+func makeSQListSelect(sqList []repository.SQ, customID SQListSelectCustomID) *discordgo.SelectMenu {
+	options := []discordgo.SelectMenuOption{}
+	for _, sq := range sqList {
+		options = append(options, discordgo.SelectMenuOption{
+			Label: sq.Title,
+			Value: sq.Title,
+		})
+	}
+	return &discordgo.SelectMenu{
+		CustomID: string(customID),
+		Options:  options,
+	}
+}
+
+func indexOfSameRegistered(members []repository.Member, userID string, memberType repository.MemberTypes) int {
+	for index, member := range members {
+		if member.UserID == userID && member.MemberType == memberType {
+			return index
+		}
+	}
+	return -1
+}
+
 func deleteOldMessages(s *discordgo.Session, channelID string) error {
 	messages, err := s.ChannelMessages(channelID, 10, "", "", "")
 	if err != nil {
