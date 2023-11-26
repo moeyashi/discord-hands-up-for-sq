@@ -136,13 +136,21 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 		rows = append(rows, actionsRow)
 	}
 
-	return &discordgo.InteractionResponse{
+	ret := &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
-			Embeds:     []*discordgo.MessageEmbed{{Fields: embedFields}},
-			Components: rows,
+			Content: "SQリスト",
 		},
-	}, nil
+	}
+	if len(embedFields) != 0 {
+		ret.Data.Embeds = []*discordgo.MessageEmbed{{Fields: embedFields}}
+	} else {
+		ret.Data.Content = "SQリストはありません。\nsq-infoのメッセージから`husq set`コマンドを実行してSQリストを設定してください。"
+	}
+	if len(rows) != 0 {
+		ret.Data.Components = rows
+	}
+	return ret, nil
 }
 
 type SQListSelectCustomID string
