@@ -120,12 +120,16 @@ func (r *firestoreRepository) getGuildOrCreate(ctx context.Context, guildID stri
 	ref := r.getGuildDocRef(guildID)
 	guild, err := ref.Get(ctx)
 	if err != nil {
-		log.Println("create new guild")
 		if status.Code(err) == codes.NotFound {
+			log.Println("create new guild")
 			newGuild := Guild{ID: guildID}
 			_, err := ref.Create(ctx, newGuild)
 			if err != nil {
-				return nil, err
+				if status.Code(err) == codes.AlreadyExists {
+					log.Println("guild already exists")
+				} else {
+					return nil, err
+				}
 			}
 			return &newGuild, nil
 		} else {
