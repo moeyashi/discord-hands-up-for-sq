@@ -1,5 +1,7 @@
 # discord-hands-up-for-sq
 
+Inspired by [hands up! ver.2](https://enoooooooon.fanbox.cc/posts/3984839)
+
 ## 使い方
 
 1. https://discord.com/api/oauth2/authorize?client_id=1168004102282813512&scope=bot から招待
