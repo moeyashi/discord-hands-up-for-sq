@@ -57,17 +57,17 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 		if member.UserID == i.Member.User.ID {
 			isExist = true
 			members = append(members[:index], members[index+1:]...)
-			responseMessage = fmt.Sprintf("%s を %s から外しました。", i.Member.User.Username, sqTitle)
+			responseMessage = fmt.Sprintf("%s を %s から外しました。", i.Member.Nick, sqTitle)
 			break
 		}
 	}
 	if !isExist {
 		members = append(members, _repo.Member{
 			UserID:     i.Member.User.ID,
-			UserName:   i.Member.User.Username,
+			UserName:   i.Member.Nick,
 			MemberType: _repo.MemberTypesParticipant,
 		})
-		responseMessage = fmt.Sprintf("%s を %s に追加しました。", i.Member.User.Username, sqTitle)
+		responseMessage = fmt.Sprintf("%s を %s に追加しました。", i.Member.Nick, sqTitle)
 	}
 	if err := repository.PutSQMembers(ctx, guild, sqTitle, members); err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
