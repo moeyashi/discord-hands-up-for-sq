@@ -201,3 +201,11 @@ func deleteOldMessages(s *discordgo.Session, channelID string) error {
 	}
 	return nil
 }
+
+func getDisplayUsername(member *discordgo.Member) string {
+	userName := member.Nick
+	if userName == "" {
+		userName = member.User.Username
+	}
+	return userName
+}
