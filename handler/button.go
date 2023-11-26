@@ -103,4 +103,8 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 		fmt.Println(err)
 		return
 	}
+
+	if err := deleteOldMessages(s, i.ChannelID); err != nil {
+		fmt.Println(err)
+	}
 }

@@ -144,3 +144,23 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 		},
 	}, nil
 }
+
+func deleteOldMessages(s *discordgo.Session, channelID string) error {
+	messages, err := s.ChannelMessages(channelID, 10, "", "", "")
+	if err != nil {
+		return err
+	}
+	lastMessage := ""
+	for _, message := range messages {
+		if message.Author.ID == s.State.User.ID && message.Flags&discordgo.MessageFlagsEphemeral == 0 {
+			if lastMessage == "" {
+				lastMessage = message.ID
+			} else {
+				if err := s.ChannelMessageDelete(channelID, message.ID); err != nil {
+					return err
+				}
+			}
+		}
+	}
+	return nil
+}

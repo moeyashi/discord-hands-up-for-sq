@@ -35,5 +35,11 @@ func ListSQ(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionC
 
 	if err := s.InteractionRespond(i.Interaction, res); err != nil {
 		fmt.Println(err)
+		return
+	}
+
+	if err := deleteOldMessages(s, i.ChannelID); err != nil {
+		fmt.Println(err)
+		return
 	}
 }
