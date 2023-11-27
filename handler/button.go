@@ -51,23 +51,24 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 	}
 
 	// SQ Memberに追加 or 削除
+	userName := getDisplayUsername(i.Member)
 	responseMessage := ""
 	isExist := false
 	for index, member := range members {
 		if member.UserID == i.Member.User.ID {
 			isExist = true
 			members = append(members[:index], members[index+1:]...)
-			responseMessage = fmt.Sprintf("%s を %s から外しました。", i.Member.Nick, sqTitle)
+			responseMessage = fmt.Sprintf("%s を %s から外しました。", userName, sqTitle)
 			break
 		}
 	}
 	if !isExist {
 		members = append(members, _repo.Member{
 			UserID:     i.Member.User.ID,
-			UserName:   i.Member.Nick,
+			UserName:   userName,
 			MemberType: _repo.MemberTypesParticipant,
 		})
-		responseMessage = fmt.Sprintf("%s を %s に追加しました。", i.Member.Nick, sqTitle)
+		responseMessage = fmt.Sprintf("%s を %s に追加しました。", userName, sqTitle)
 	}
 	if err := repository.PutSQMembers(ctx, guild, sqTitle, members); err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
