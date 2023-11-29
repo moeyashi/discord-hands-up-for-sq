@@ -40,7 +40,7 @@ func Test_createSetCommandsInFuture_今日明日のイベントが取得でき�
 		"/hands-up set hour:29日09:00 2v2 number:12",
 	}
 	if len(result) != len(expected) {
-		t.Errorf("len(result) = %d, want %d", len(result), len(expected))
+		t.Fatalf("len(result) = %d, want %d", len(result), len(expected))
 	}
 	for i, v := range result {
 		if v != expected[i] {
@@ -53,15 +53,15 @@ func Test_createSetCommandsInFuture_未来のイベントがない場合_空のs
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	tests := []struct {
 		name string
-		now time.Time
+		now  time.Time
 	}{
 		{
 			name: "nowが2023-10-29 09:00:01の場合",
-			now: time.Date(2023, 10, 29, 9, 0, 1, 0, jst),
+			now:  time.Date(2023, 10, 29, 9, 0, 1, 0, jst),
 		},
 		{
 			name: "nowが2023-10-30の場合",
-			now: time.Date(2023, 10, 30, 0, 0, 0, 0, jst),
+			now:  time.Date(2023, 10, 30, 0, 0, 0, 0, jst),
 		},
 	}
 	for _, tt := range tests {
@@ -94,7 +94,55 @@ func Test_createOutCommandsForAll(t *testing.T) {
 		"/hands-up out hour:27日12:00",
 	}
 	if len(actual) != len(expected) {
-		t.Errorf("len(actual) = %d, want %d", len(actual), len(expected))
+		t.Fatalf("len(actual) = %d, want %d", len(actual), len(expected))
+	}
+	for i, v := range actual {
+		if v != expected[i] {
+			t.Errorf("actual[%d] = %s, want %s", i, v, expected[i])
+		}
+	}
+}
+
+func Test_sqListInFuture_0時のとき3日後まで取得できる(t *testing.T) {
+	jst, _ := time.LoadLocation("Asia/Tokyo")
+	actual := sqListInFuture(sampleSQInfo, time.Date(2023, 10, 26, 0, 0, 0, 0, jst))
+	expected := []string{
+		"26日06:00 2v2",
+		"26日11:00 6v6",
+		"26日21:00 3v3",
+		"27日03:00 2v2",
+		"27日12:00 3v3",
+		"27日23:00 4v4",
+		"28日06:00 3v3",
+		"28日12:00 6v6",
+		"28日19:00 2v2",
+	}
+	if len(actual) != len(expected) {
+		t.Fatalf("len(actual) = %d, want %d", len(actual), len(expected))
+	}
+	for i, v := range actual {
+		if v != expected[i] {
+			t.Errorf("actual[%d] = %s, want %s", i, v, expected[i])
+		}
+	}
+}
+
+func Test_sqListInFuture_日付の変わる直前のとき3日後まで取得できる(t *testing.T) {
+	jst, _ := time.LoadLocation("Asia/Tokyo")
+	actual := sqListInFuture(sampleSQInfo, time.Date(2023, 10, 25, 23, 59, 59, 0, jst))
+	expected := []string{
+		"26日06:00 2v2",
+		"26日11:00 6v6",
+		"26日21:00 3v3",
+		"27日03:00 2v2",
+		"27日12:00 3v3",
+		"27日23:00 4v4",
+		"28日06:00 3v3",
+		"28日12:00 6v6",
+		"28日19:00 2v2",
+	}
+	if len(actual) != len(expected) {
+		t.Fatalf("len(actual) = %d, want %d", len(actual), len(expected))
 	}
 	for i, v := range actual {
 		if v != expected[i] {

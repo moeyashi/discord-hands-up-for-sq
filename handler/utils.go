@@ -30,7 +30,7 @@ func sqListInFuture(sqInfo string, now time.Time) []string {
 			log.Println(err)
 			return []string{}
 		}
-		if nowUnix <= timestamp {
+		if nowUnix <= timestamp && timestamp <= nowUnix+60*60*24*3 {
 			hourContent := time.Unix(timestamp, 0).In(jst).Format("2日15:04")
 			mogiFormat := submatches[2]
 			sqList = append(sqList, fmt.Sprintf("%s %s", hourContent, mogiFormat))
