@@ -82,7 +82,7 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 	}
 
 	// メッセージの作成
-	res, err := createSQListInteractionResponse(ctx, guild.SQList, repository)
+	res, err := createSQListInteractionResponse(ctx, guild.SQList)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

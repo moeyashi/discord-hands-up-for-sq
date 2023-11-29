@@ -67,16 +67,16 @@ var (
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Description: "SQイベントに参加します",
 				},
-				// {
-				// 	Name:        "temp",
-				// 	Type:        discordgo.ApplicationCommandOptionSubCommand,
-				// 	Description: "SQイベントに仮参加します",
-				// },
-				// {
-				// 	Name:        "sub",
-				// 	Type:        discordgo.ApplicationCommandOptionSubCommand,
-				// 	Description: "SQイベントに補欠参加します",
-				// },
+				{
+					Name:        "temp",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "SQイベントに仮参加します",
+				},
+				{
+					Name:        "sub",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "SQイベントに補欠参加します",
+				},
 				{
 					Name:        "version",
 					Description: "バージョンを確認",
@@ -244,14 +244,14 @@ var (
 				handler.ListSQ(ctx, s, i, repository)
 				return
 			case "can":
-				handler.CanHUSQ(ctx, s, i, repository)
+				handler.HandleCan(ctx, s, i, repository)
 				return
-			// case "temp":
-			// 	handler.
-			// 	return
-			// case "sub":
-			// 	handler.
-			// 	return
+			case "temp":
+				handler.HandleTemp(ctx, s, i, repository)
+				return
+			case "sub":
+				handler.HandleSub(ctx, s, i, repository)
+				return
 			case "version":
 				handler.GetVersion(ctx, s, i, repository)
 				return
@@ -554,7 +554,11 @@ func init() {
 		case discordgo.InteractionMessageComponent:
 			customID := i.MessageComponentData().CustomID
 			if customID == string(handler.SQListSelectCustomIDCan) {
-				handler.HandleSelectCan(ctx, s, i, repository)
+				handler.HandleSelect(ctx, s, i, repository)
+			} else if customID == string(handler.SQListSelectCustomIDTemp) {
+				handler.HandleSelect(ctx, s, i, repository)
+			} else if customID == string(handler.SQListSelectCustomIDSub) {
+				handler.HandleSelect(ctx, s, i, repository)
 			} else if strings.HasPrefix(customID, "button_") {
 				handler.HandleClick(ctx, s, i, repository)
 			}

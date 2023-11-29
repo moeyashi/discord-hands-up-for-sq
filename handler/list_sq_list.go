@@ -21,7 +21,7 @@ func ListSQ(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionC
 		return
 	}
 
-	res, err := createSQListInteractionResponse(ctx, guild.SQList, repository)
+	res, err := createSQListInteractionResponse(ctx, guild.SQList)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

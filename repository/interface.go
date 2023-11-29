@@ -16,6 +16,7 @@ type MemberTypes int
 const (
 	MemberTypesParticipant MemberTypes = 1
 	MemberTypesTemporary   MemberTypes = 2
+	MemberTypesSub         MemberTypes = 3
 )
 
 type Member struct {

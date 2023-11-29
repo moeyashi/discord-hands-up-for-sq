@@ -97,7 +97,7 @@ func createOutCommandsForAll(handsUpNow []discordgo.MessageComponent) []string {
 	return commands
 }
 
-func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ, repository repository.Repository) (*discordgo.InteractionResponse, error) {
+func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ) (*discordgo.InteractionResponse, error) {
 	embedFields := []*discordgo.MessageEmbedField{}
 	components := []discordgo.MessageComponent{}
 	for _, sq := range sqList {
@@ -105,7 +105,13 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 		embedFieldsValue := "なし"
 		userNames := []string{}
 		for _, member := range members {
-			userNames = append(userNames, member.UserName)
+			userName := member.UserName
+			if member.MemberType == repository.MemberTypesTemporary {
+				userName = userName + "(仮)"
+			} else if member.MemberType == repository.MemberTypesSub {
+				userName = userName + "(sub)"
+			}
+			userNames = append(userNames, userName)
 		}
 		if len(userNames) > 0 {
 			embedFieldsValue = strings.Join(userNames, ",")
@@ -156,12 +162,18 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 type SQListSelectCustomID string
 
 const (
-	SQListSelectCustomIDCan SQListSelectCustomID = "can_select"
+	SQListSelectCustomIDCan  SQListSelectCustomID = "can_select"
+	SQListSelectCustomIDTemp SQListSelectCustomID = "temp_select"
+	SQListSelectCustomIDSub  SQListSelectCustomID = "sub_select"
 )
 
-func makeSQListSelect(sqList []repository.SQ, customID SQListSelectCustomID) *discordgo.SelectMenu {
+func makeSQListSelect(userID string, sqList []repository.SQ, customID SQListSelectCustomID) *discordgo.SelectMenu {
+	memberType := customIDToMemberType(string(customID))
 	options := []discordgo.SelectMenuOption{}
 	for _, sq := range sqList {
+		if indexOfSameRegistered(sq.Members, userID, memberType) >= 0 {
+			continue
+		}
 		options = append(options, discordgo.SelectMenuOption{
 			Label: sq.Title,
 			Value: sq.Title,
@@ -176,6 +188,15 @@ func makeSQListSelect(sqList []repository.SQ, customID SQListSelectCustomID) *di
 func indexOfSameRegistered(members []repository.Member, userID string, memberType repository.MemberTypes) int {
 	for index, member := range members {
 		if member.UserID == userID && member.MemberType == memberType {
+			return index
+		}
+	}
+	return -1
+}
+
+func indexOfSameMember(members []repository.Member, userID string) int {
+	for index, member := range members {
+		if member.UserID == userID {
 			return index
 		}
 	}
@@ -208,4 +229,17 @@ func getDisplayUsername(member *discordgo.Member) string {
 		userName = member.User.Username
 	}
 	return userName
+}
+
+func customIDToMemberType(customID string) repository.MemberTypes {
+	switch customID {
+	case string(SQListSelectCustomIDCan):
+		return repository.MemberTypesParticipant
+	case string(SQListSelectCustomIDTemp):
+		return repository.MemberTypesTemporary
+	case string(SQListSelectCustomIDSub):
+		return repository.MemberTypesSub
+	default:
+		return repository.MemberTypesParticipant
+	}
 }
