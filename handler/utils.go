@@ -14,26 +14,26 @@ import (
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
-func sqListInFuture(sqInfo string, now time.Time) []string {
+func sqListInFuture(sqInfo string, now time.Time) []repository.SQ {
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {
 		log.Println(err)
-		return []string{}
+		return []repository.SQ{}
 	}
 	nowUnix := now.Unix()
 	re := regexp.MustCompile("`#(\\d+)` \\*\\*(\\dv\\d):\\*\\* <t:(\\d+):F>")
 	results := re.FindAllStringSubmatch(sqInfo, -1)
-	sqList := []string{}
+	sqList := []repository.SQ{}
 	for _, submatches := range results {
 		timestamp, err := strconv.ParseInt(submatches[3], 10, 64)
 		if err != nil {
 			log.Println(err)
-			return []string{}
+			return []repository.SQ{}
 		}
 		if nowUnix <= timestamp && timestamp <= nowUnix+60*60*24*3 {
 			hourContent := time.Unix(timestamp, 0).In(jst).Format("2日15:04")
 			mogiFormat := submatches[2]
-			sqList = append(sqList, fmt.Sprintf("%s %s", hourContent, mogiFormat))
+			sqList = append(sqList, repository.SQ{ID: submatches[1], Title: fmt.Sprintf("%s %s", hourContent, mogiFormat), Format: mogiFormat, Timestamp: time.Unix(timestamp, 0)})
 		}
 	}
 	return sqList

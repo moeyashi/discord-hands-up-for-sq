@@ -70,26 +70,35 @@ func (r *firestoreRepository) GetSQList(ctx context.Context, guild *Guild) ([]SQ
 	return guild.SQList, nil
 }
 
-func (r *firestoreRepository) PutSQList(ctx context.Context, guild *Guild, sqList []string) error {
+func (r *firestoreRepository) PutSQList(ctx context.Context, guild *Guild, sqList []SQ) error {
 	addedSQTitle := []string{}
 	newSQList := []SQ{}
 	// すでにfirestoreにあるものはそのまま残す
 	for _, sq := range guild.SQList {
-		if slices.Contains(sqList, sq.Title) {
+		if isContainsByTitle(sqList, sq.Title) {
 			newSQList = append(newSQList, sq)
 			addedSQTitle = append(addedSQTitle, sq.Title)
 		}
 	}
 	// 新規追加
-	for _, title := range sqList {
-		if !slices.Contains(addedSQTitle, title) {
-			newSQList = append(newSQList, SQ{Title: title})
+	for _, sq := range sqList {
+		if !slices.Contains(addedSQTitle, sq.Title) {
+			newSQList = append(newSQList, sq)
 		}
 	}
 
 	guild.SQList = newSQList
 	_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
 	return err
+}
+
+func isContainsByTitle(sqList []SQ, title string) bool {
+	for _, sq := range sqList {
+		if sq.Title == title {
+			return true
+		}
+	}
+	return false
 }
 
 func (r *firestoreRepository) GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error) {
