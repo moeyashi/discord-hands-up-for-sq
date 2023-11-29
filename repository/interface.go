@@ -1,12 +1,15 @@
 package repository
 
-import "context"
+import (
+	"context"
+	"time"
+)
 
 type Repository interface {
 	GetVersion(ctx context.Context) (*version, error)
 	GetGuild(ctx context.Context, guildID string) (*Guild, error)
 	GetSQList(ctx context.Context, guild *Guild) ([]SQ, error)
-	PutSQList(ctx context.Context, guild *Guild, sqList []string) error
+	PutSQList(ctx context.Context, guild *Guild, sqList []SQ) error
 	GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error)
 	PutSQMembers(ctx context.Context, guild *Guild, sqTitle string, members []Member) error
 }
@@ -26,8 +29,11 @@ type Member struct {
 }
 
 type SQ struct {
-	Title   string   `firestore:"title"`
-	Members []Member `firestore:"members"`
+	ID        string    `firestore:"id"`
+	Title     string    `firestore:"title"`
+	Members   []Member  `firestore:"members"`
+	Format    string    `firestore:"format"`
+	Timestamp time.Time `firestore:"timestamp"`
 }
 
 type Guild struct {
