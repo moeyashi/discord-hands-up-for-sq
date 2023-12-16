@@ -118,7 +118,7 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 		}
 
 		embedFields = append(embedFields, &discordgo.MessageEmbedField{
-			Name:  sq.Title,
+			Name:  makeSQListEmbedFieldName(sq.Title, len(members)),
 			Value: embedFieldsValue,
 		})
 		components = append(components, discordgo.Button{
@@ -157,6 +157,10 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 		ret.Data.Components = rows
 	}
 	return ret, nil
+}
+
+func makeSQListEmbedFieldName(title string, numOfMembers int) string {
+	return fmt.Sprintf("%s (%d)", title, numOfMembers)
 }
 
 type SQListSelectCustomID string

@@ -158,3 +158,11 @@ func assertSQ(actual repository.SQ, expected repository.SQ) bool {
 		actual.Format == expected.Format &&
 		actual.Timestamp.Equal(expected.Timestamp)
 }
+
+func Test_makeSQListEmbedFieldName(t *testing.T) {
+	actual := makeSQListEmbedFieldName("26日06:00 2v2", 1)
+	expected := "26日06:00 2v2 (1)"
+	if actual != expected {
+		t.Errorf("actual = %s, want %s", actual, expected)
+	}
+}
