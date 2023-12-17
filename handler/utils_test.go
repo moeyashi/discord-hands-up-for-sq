@@ -160,9 +160,51 @@ func assertSQ(actual repository.SQ, expected repository.SQ) bool {
 }
 
 func Test_makeSQListEmbedFieldName(t *testing.T) {
-	actual := makeSQListEmbedFieldName("26日06:00 2v2", 1)
-	expected := "26日06:00 2v2 (1)"
-	if actual != expected {
-		t.Errorf("actual = %s, want %s", actual, expected)
+	tests := []struct {
+		name     string
+		sq       repository.SQ
+		expected string
+	}{
+		{name: "memberがいなければtitleのみ", sq: repository.SQ{Title: "26日06:00 2v2"}, expected: "26日06:00 2v2"},
+		{name: "memberがいればtitleとmember数", sq: repository.SQ{Title: "26日06:00 2v2", Members: []repository.Member{
+			{MemberType: repository.MemberTypesParticipant},
+			{MemberType: repository.MemberTypesTemporary},
+			{MemberType: repository.MemberTypesTemporary},
+			{MemberType: repository.MemberTypesSub},
+			{MemberType: repository.MemberTypesSub},
+			{MemberType: repository.MemberTypesSub},
+		}}, expected: "26日06:00 2v2 (can 1, temp 2, sub 3)"},
+		{name: "memberがいればtitleとmember数 canのみ", sq: repository.SQ{Title: "26日06:00 2v2", Members: []repository.Member{
+			{MemberType: repository.MemberTypesParticipant},
+		}}, expected: "26日06:00 2v2 (can 1)"},
+		{name: "memberがいればtitleとmember数 tempのみ", sq: repository.SQ{Title: "26日06:00 2v2", Members: []repository.Member{
+			{MemberType: repository.MemberTypesTemporary},
+		}}, expected: "26日06:00 2v2 (temp 1)"},
+		{name: "memberがいればtitleとmember数 subのみ", sq: repository.SQ{Title: "26日06:00 2v2", Members: []repository.Member{
+			{MemberType: repository.MemberTypesSub},
+		}}, expected: "26日06:00 2v2 (sub 1)"},
+		{name: "memberがいればtitleとmember数 canとtemp", sq: repository.SQ{Title: "26日06:00 2v2", Members: []repository.Member{
+			{MemberType: repository.MemberTypesParticipant},
+			{MemberType: repository.MemberTypesTemporary},
+			{MemberType: repository.MemberTypesTemporary},
+		}}, expected: "26日06:00 2v2 (can 1, temp 2)"},
+		{name: "memberがいればtitleとmember数 canとsub", sq: repository.SQ{Title: "26日06:00 2v2", Members: []repository.Member{
+			{MemberType: repository.MemberTypesParticipant},
+			{MemberType: repository.MemberTypesSub},
+			{MemberType: repository.MemberTypesSub},
+		}}, expected: "26日06:00 2v2 (can 1, sub 2)"},
+		{name: "memberがいればtitleとmember数 tempとsub", sq: repository.SQ{Title: "26日06:00 2v2", Members: []repository.Member{
+			{MemberType: repository.MemberTypesTemporary},
+			{MemberType: repository.MemberTypesSub},
+			{MemberType: repository.MemberTypesSub},
+		}}, expected: "26日06:00 2v2 (temp 1, sub 2)"},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			actual := makeSQListEmbedFieldName(tt.sq)
+			if actual != tt.expected {
+				t.Errorf("actual = %s, want %s", actual, tt.expected)
+			}
+		})
 	}
 }
