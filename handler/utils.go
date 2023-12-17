@@ -101,10 +101,9 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 	embedFields := []*discordgo.MessageEmbedField{}
 	components := []discordgo.MessageComponent{}
 	for _, sq := range sqList {
-		members := sq.Members
 		embedFieldsValue := "なし"
 		userNames := []string{}
-		for _, member := range members {
+		for _, member := range sq.Members {
 			userName := member.UserName
 			if member.MemberType == repository.MemberTypesTemporary {
 				userName = userName + "(仮)"
@@ -118,7 +117,7 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 		}
 
 		embedFields = append(embedFields, &discordgo.MessageEmbedField{
-			Name:  makeSQListEmbedFieldName(sq.Title, len(members)),
+			Name:  makeSQListEmbedFieldName(sq),
 			Value: embedFieldsValue,
 		})
 		components = append(components, discordgo.Button{
@@ -159,8 +158,36 @@ func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ
 	return ret, nil
 }
 
-func makeSQListEmbedFieldName(title string, numOfMembers int) string {
-	return fmt.Sprintf("%s (%d)", title, numOfMembers)
+func makeSQListEmbedFieldName(
+	sq repository.SQ,
+) string {
+	canMembersCount := 0
+	tempMembersCount := 0
+	subMembersCount := 0
+	for _, member := range sq.Members {
+		switch member.MemberType {
+		case repository.MemberTypesParticipant:
+			canMembersCount++
+		case repository.MemberTypesTemporary:
+			tempMembersCount++
+		case repository.MemberTypesSub:
+			subMembersCount++
+		}
+	}
+	members := []string{}
+	if canMembersCount > 0 {
+		members = append(members, fmt.Sprintf("can %d", canMembersCount))
+	}
+	if tempMembersCount > 0 {
+		members = append(members, fmt.Sprintf("temp %d", tempMembersCount))
+	}
+	if subMembersCount > 0 {
+		members = append(members, fmt.Sprintf("sub %d", subMembersCount))
+	}
+	if len(members) == 0 {
+		return sq.Title
+	}
+	return fmt.Sprintf("%s (%s)", sq.Title, strings.Join(members, ", "))
 }
 
 type SQListSelectCustomID string
