@@ -104,7 +104,7 @@ func Test_createOutCommandsForAll(t *testing.T) {
 	}
 }
 
-func Test_sqListInFuture_0時のとき3日後まで取得できる(t *testing.T) {
+func Test_sqListInFuture_現在日時以降のものがすべて取得できる(t *testing.T) {
 	jst, _ := time.LoadLocation("Asia/Tokyo")
 	actual := sqListInFuture(sampleSQInfo, time.Date(2023, 10, 26, 0, 0, 0, 0, jst))
 	expected := []repository.SQ{
@@ -117,30 +117,8 @@ func Test_sqListInFuture_0時のとき3日後まで取得できる(t *testing.T)
 		{ID: "1770", Title: "28日06:00 3v3", Format: "3v3", Timestamp: time.Date(2023, 10, 28, 6, 0, 0, 0, jst)},
 		{ID: "1771", Title: "28日12:00 6v6", Format: "6v6", Timestamp: time.Date(2023, 10, 28, 12, 0, 0, 0, jst)},
 		{ID: "1772", Title: "28日19:00 2v2", Format: "2v2", Timestamp: time.Date(2023, 10, 28, 19, 0, 0, 0, jst)},
-	}
-	if len(actual) != len(expected) {
-		t.Fatalf("len(actual) = %d, want %d", len(actual), len(expected))
-	}
-	for i, v := range actual {
-		if !assertSQ(v, expected[i]) {
-			t.Errorf("actual[%d] = %s, want %s", i, v.Title, expected[i].Title)
-		}
-	}
-}
-
-func Test_sqListInFuture_日付の変わる直前のとき3日後まで取得できる(t *testing.T) {
-	jst, _ := time.LoadLocation("Asia/Tokyo")
-	actual := sqListInFuture(sampleSQInfo, time.Date(2023, 10, 25, 23, 59, 59, 0, jst))
-	expected := []repository.SQ{
-		{ID: "1764", Title: "26日06:00 2v2", Format: "2v2", Timestamp: time.Date(2023, 10, 26, 6, 0, 0, 0, jst)},
-		{ID: "1765", Title: "26日11:00 6v6", Format: "6v6", Timestamp: time.Date(2023, 10, 26, 11, 0, 0, 0, jst)},
-		{ID: "1766", Title: "26日21:00 3v3", Format: "3v3", Timestamp: time.Date(2023, 10, 26, 21, 0, 0, 0, jst)},
-		{ID: "1767", Title: "27日03:00 2v2", Format: "2v2", Timestamp: time.Date(2023, 10, 27, 3, 0, 0, 0, jst)},
-		{ID: "1768", Title: "27日12:00 3v3", Format: "3v3", Timestamp: time.Date(2023, 10, 27, 12, 0, 0, 0, jst)},
-		{ID: "1769", Title: "27日23:00 4v4", Format: "4v4", Timestamp: time.Date(2023, 10, 27, 23, 0, 0, 0, jst)},
-		{ID: "1770", Title: "28日06:00 3v3", Format: "3v3", Timestamp: time.Date(2023, 10, 28, 6, 0, 0, 0, jst)},
-		{ID: "1771", Title: "28日12:00 6v6", Format: "6v6", Timestamp: time.Date(2023, 10, 28, 12, 0, 0, 0, jst)},
-		{ID: "1772", Title: "28日19:00 2v2", Format: "2v2", Timestamp: time.Date(2023, 10, 28, 19, 0, 0, 0, jst)},
+		{ID: "1773", Title: "29日03:00 2v2", Format: "2v2", Timestamp: time.Date(2023, 10, 29, 3, 0, 0, 0, jst)},
+		{ID: "1774", Title: "29日09:00 2v2", Format: "2v2", Timestamp: time.Date(2023, 10, 29, 9, 0, 0, 0, jst)},
 	}
 	if len(actual) != len(expected) {
 		t.Fatalf("len(actual) = %d, want %d", len(actual), len(expected))
