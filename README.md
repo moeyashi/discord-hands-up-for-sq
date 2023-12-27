@@ -5,6 +5,9 @@ Inspired by [hands up! ver.2](https://enoooooooon.fanbox.cc/posts/3984839)
 ## 使い方
 
 1. https://discord.com/api/oauth2/authorize?client_id=1168004102282813512&scope=bot から招待
+2. `MK8DX 150cc Lounge #sq-info`を招待したサーバーでフォローする。
+3. sq-infoからのメッセージを受信すると自動でリストを作成します。
+4. `/husq list`でリストを表示します。
 
 ## 開発
 
