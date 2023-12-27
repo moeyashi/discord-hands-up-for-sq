@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
@@ -21,7 +22,7 @@ func ListSQ(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionC
 		return
 	}
 
-	res, err := createSQListInteractionResponse(ctx, guild.SQList)
+	res, err := createSQListInteractionResponse(guild.SQList, time.Now())
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,
