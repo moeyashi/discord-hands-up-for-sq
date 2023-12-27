@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
@@ -82,7 +83,7 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 	}
 
 	// メッセージの作成
-	res, err := createSQListInteractionResponse(ctx, guild.SQList)
+	res, err := createSQListInteractionResponse(guild.SQList, time.Now())
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

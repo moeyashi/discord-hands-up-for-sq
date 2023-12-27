@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -97,10 +96,18 @@ func createOutCommandsForAll(handsUpNow []discordgo.MessageComponent) []string {
 	return commands
 }
 
-func createSQListInteractionResponse(ctx context.Context, sqList []repository.SQ) (*discordgo.InteractionResponse, error) {
+func createSQListInteractionResponse(sqList []repository.SQ, now time.Time) (*discordgo.InteractionResponse, error) {
 	embedFields := []*discordgo.MessageEmbedField{}
 	components := []discordgo.MessageComponent{}
+
 	for _, sq := range sqList {
+		// now ~ 3日後までのSQを表示
+		nowUnix := now.Unix()
+		sqUnix := sq.Timestamp.Unix()
+		if nowUnix > sqUnix || nowUnix+60*60*24*3 < sqUnix {
+			continue
+		}
+
 		embedFieldsValue := "なし"
 		userNames := []string{}
 		for _, member := range sq.Members {

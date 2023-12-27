@@ -3,6 +3,7 @@ package handler
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/bwmarrin/discordgo"
 	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
@@ -70,7 +71,7 @@ func HandleSelect(ctx context.Context, s *discordgo.Session, i *discordgo.Intera
 	}
 
 	// メッセージの作成
-	res, err := createSQListInteractionResponse(ctx, guild.SQList)
+	res, err := createSQListInteractionResponse(guild.SQList, time.Now())
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Flags:   discordgo.MessageFlagsEphemeral,
