@@ -14,6 +14,14 @@ type Repository interface {
 	PutSQMembers(ctx context.Context, guild *Guild, sqTitle string, members []Member) error
 }
 
+type LoungeRepository interface {
+	GetLoungeName(ctx context.Context, userID string) (*getLoungeNameResponse, error)
+}
+
+type getLoungeNameResponse struct {
+	Name string `json:"name"`
+}
+
 type MemberTypes int
 
 const (

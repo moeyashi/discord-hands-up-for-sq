@@ -74,6 +74,11 @@ var (
 					Description: "SQイベントに補欠参加します",
 				},
 				{
+					Name:        "lounge-name",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "ラウンジでのユーザー名を表示します",
+				},
+				{
 					Name:        "version",
 					Description: "バージョンを確認",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
@@ -111,6 +116,9 @@ var (
 			case "sub":
 				handler.HandleSub(ctx, s, i, repository)
 				return
+			case "lounge-name":
+				handler.HandleLoungeName(ctx, s, i, repository)
+				return
 			case "version":
 				handler.GetVersion(ctx, s, i, repository)
 				return
@@ -142,6 +150,8 @@ func init() {
 				handler.HandleSelect(ctx, s, i, repository)
 			} else if customID == string(handler.SQListSelectCustomIDSub) {
 				handler.HandleSelect(ctx, s, i, repository)
+			} else if customID == "lounge_name_select" {
+				handler.HandleLoungeNameSelect(ctx, s, i, repository)
 			} else if strings.HasPrefix(customID, "button_") {
 				handler.HandleClick(ctx, s, i, repository)
 			}
