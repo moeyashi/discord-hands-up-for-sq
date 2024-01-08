@@ -218,6 +218,9 @@ func makeSQListSelect(userID string, sqList []repository.SQ, customID SQListSele
 		options = append(options, discordgo.SelectMenuOption{
 			Label: sq.Title,
 			Value: sq.Title,
+			// 緊急対応、以下がリリースされたら削除する
+			// https://github.com/bwmarrin/discordgo/pull/1476
+			Emoji: discordgo.ComponentEmoji{Name: "✅"},
 		})
 	}
 	return &discordgo.SelectMenu{

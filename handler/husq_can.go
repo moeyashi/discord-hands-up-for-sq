@@ -33,7 +33,7 @@ func handleHandsUp(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		return
 	}
 
-	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+	err = s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
 			Flags: discordgo.MessageFlagsEphemeral,
@@ -46,4 +46,14 @@ func handleHandsUp(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 			},
 		},
 	})
+
+	if err != nil {
+		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+			Type: discordgo.InteractionResponseChannelMessageWithSource,
+			Data: &discordgo.InteractionResponseData{
+				Flags:   discordgo.MessageFlagsEphemeral,
+				Content: fmt.Sprint(err),
+			},
+		})
+	}
 }
