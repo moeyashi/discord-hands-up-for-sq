@@ -131,6 +131,9 @@ func createSQListInteractionResponse(sqList []repository.SQ, now time.Time) (*di
 			CustomID: "button_" + sq.Title,
 			Label:    sq.Title,
 			Style:    discordgo.SecondaryButton,
+			// 緊急対応、以下がリリースされたら削除する
+			// https://github.com/bwmarrin/discordgo/pull/1476
+			Emoji: discordgo.ComponentEmoji{Name: "✅"},
 		})
 	}
 
