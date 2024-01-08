@@ -96,18 +96,27 @@ func createOutCommandsForAll(handsUpNow []discordgo.MessageComponent) []string {
 	return commands
 }
 
+func filterSQListForDisplay(sqList []repository.SQ, now time.Time) []repository.SQ {
+	nowUnix := now.Unix()
+	filteredSQList := []repository.SQ{}
+	for _, sq := range sqList {
+		sqUnix := sq.Timestamp.Unix()
+		// now ~ 3日後までのSQを表示
+		if nowUnix > sqUnix || nowUnix+60*60*24*3 < sqUnix {
+			continue
+		}
+		filteredSQList = append(filteredSQList, sq)
+	}
+	return filteredSQList
+}
+
 func createSQListInteractionResponse(sqList []repository.SQ, now time.Time) (*discordgo.InteractionResponse, error) {
 	embedFields := []*discordgo.MessageEmbedField{}
 	components := []discordgo.MessageComponent{}
 
-	for _, sq := range sqList {
-		// now ~ 3日後までのSQを表示
-		nowUnix := now.Unix()
-		sqUnix := sq.Timestamp.Unix()
-		if nowUnix > sqUnix || nowUnix+60*60*24*3 < sqUnix {
-			continue
-		}
+	filteredSQList := filterSQListForDisplay(sqList, now)
 
+	for _, sq := range filteredSQList {
 		embedFieldsValue := "なし"
 		userNames := []string{}
 		for _, member := range sq.Members {
@@ -131,6 +140,9 @@ func createSQListInteractionResponse(sqList []repository.SQ, now time.Time) (*di
 			CustomID: "button_" + sq.Title,
 			Label:    sq.Title,
 			Style:    discordgo.SecondaryButton,
+			// 緊急対応、以下がリリースされたら削除する
+			// https://github.com/bwmarrin/discordgo/pull/1476
+			Emoji: discordgo.ComponentEmoji{Name: "✅"},
 		})
 	}
 
@@ -205,16 +217,20 @@ const (
 	SQListSelectCustomIDSub  SQListSelectCustomID = "sub_select"
 )
 
-func makeSQListSelect(userID string, sqList []repository.SQ, customID SQListSelectCustomID) *discordgo.SelectMenu {
+func makeSQListSelect(userID string, sqList []repository.SQ, customID SQListSelectCustomID, now time.Time) *discordgo.SelectMenu {
+	filteredSQList := filterSQListForDisplay(sqList, now)
 	memberType := customIDToMemberType(string(customID))
 	options := []discordgo.SelectMenuOption{}
-	for _, sq := range sqList {
+	for _, sq := range filteredSQList {
 		if indexOfSameRegistered(sq.Members, userID, memberType) >= 0 {
 			continue
 		}
 		options = append(options, discordgo.SelectMenuOption{
 			Label: sq.Title,
 			Value: sq.Title,
+			// 緊急対応、以下がリリースされたら削除する
+			// https://github.com/bwmarrin/discordgo/pull/1476
+			Emoji: discordgo.ComponentEmoji{Name: "✅"},
 		})
 	}
 	return &discordgo.SelectMenu{
