@@ -25,7 +25,7 @@ import (
 var (
 	GuildID        = flag.String("guild", "", "Test guild ID. If not passed - bot registers commands globally")
 	BotToken       = flag.String("token", "", "Bot access token")
-	RemoveCommands = flag.Bool("rmcmd", true, "Remove all commands after shutdowning or not")
+	RemoveCommands = flag.Bool("rmcmd", false, "Remove all commands after shutdowning or not")
 )
 
 var s *discordgo.Session
@@ -79,6 +79,11 @@ var (
 					Description: "ラウンジでのユーザー名を表示します",
 				},
 				{
+					Name:        "mention",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "次のSQのメンバーにメンションします",
+				},
+				{
 					Name:        "version",
 					Description: "バージョンを確認",
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
@@ -89,6 +94,27 @@ var (
 			Name: "husq set",
 			Type: discordgo.MessageApplicationCommand,
 		},
+		// {
+		// 	Name:        "civil",
+		// 	Description: "Hands up for civil war",
+		// 	Options: []*discordgo.ApplicationCommandOption{
+		// 		{
+		// 			Name:        "list",
+		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
+		// 			Description: "内戦イベントを取得します",
+		// 		},
+		// 		{
+		// 			Name:        "add",
+		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
+		// 			Description: "内戦イベントを追加",
+		// 		},
+		// 		{
+		// 			Name:        "remove",
+		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
+		// 			Description: "内戦イベントを削除",
+		// 		},
+		// 	},
+		// },
 		{
 			Name: "setコマンドに変換",
 			Type: discordgo.MessageApplicationCommand,
@@ -118,6 +144,9 @@ var (
 				return
 			case "lounge-name":
 				handler.HandleLoungeName(ctx, s, i, repository)
+				return
+			case "mention":
+				handler.HandleMention(ctx, s, i, repository)
 				return
 			case "version":
 				handler.GetVersion(ctx, s, i, repository)
@@ -180,14 +209,16 @@ func main() {
 		log.Fatalf("Cannot open the session: %v", err)
 	}
 
-	log.Println("Adding commands...")
 	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
-	for i, v := range commands {
-		cmd, err := s.ApplicationCommandCreate(s.State.User.ID, *GuildID, v)
-		if err != nil {
-			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+	if *RemoveCommands {
+		log.Println("Adding commands...")
+		for i, v := range commands {
+			cmd, err := s.ApplicationCommandCreate(s.State.User.ID, *GuildID, v)
+			if err != nil {
+				log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+			}
+			registeredCommands[i] = cmd
 		}
-		registeredCommands[i] = cmd
 	}
 
 	defer s.Close()
