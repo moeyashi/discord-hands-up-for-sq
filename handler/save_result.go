@@ -25,6 +25,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 	sheat, err := convertMessageToSheat(msg)
 
 	if err != nil {
+		fmt.Println(err)
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Content: err.Error(),
 		}); err != nil {
@@ -36,6 +37,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 
 	guild, err := repository.GetGuild(ctx, i.GuildID)
 	if err != nil {
+		fmt.Println(err)
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Content: "データベースからの取得に失敗しました。",
 		}); err != nil {
@@ -58,6 +60,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 	credential := option.WithCredentialsFile("./google-api-credential.json")
 	srv, err := sheets.NewService(ctx, credential)
 	if err != nil {
+		fmt.Println(err)
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Content: "スプレッドシートへの接続に失敗しました。",
 		}); err != nil {
@@ -87,6 +90,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 		Values: values,
 	}).ValueInputOption("RAW").InsertDataOption("INSERT_ROWS").Do()
 	if err != nil {
+		fmt.Println(err)
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Content: "スプレッドシートへの書き込みに失敗しました。",
 		}); err != nil {
