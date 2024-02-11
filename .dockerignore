@@ -1,0 +1,15 @@
+.env
+.env.example
+.firebaserc
+.git
+.gitignore
+firebase.json
+firestore.indexes.json
+firestore.rules
+fly.toml
+LICENSE
+README.md
+
+*.log
+
+deploy-commands/
