@@ -15,6 +15,7 @@ import (
 	// "time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/commands"
 	"github.com/moeyashi/discord-hands-up-for-sq/handler"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
@@ -48,83 +49,6 @@ func init() {
 }
 
 var (
-	commands = []*discordgo.ApplicationCommand{
-		{
-			Name:        "husq",
-			Description: "Hands up for SQ",
-			Options: []*discordgo.ApplicationCommandOption{
-				{
-					Name:        "list",
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Description: "SQイベントを取得します",
-				},
-				{
-					Name:        "can",
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Description: "SQイベントに参加します",
-				},
-				{
-					Name:        "temp",
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Description: "SQイベントに仮参加します",
-				},
-				{
-					Name:        "sub",
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Description: "SQイベントに補欠参加します",
-				},
-				{
-					Name:        "lounge-name",
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Description: "ラウンジでのユーザー名を表示します",
-				},
-				{
-					Name:        "mention",
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-					Description: "次のSQのメンバーにメンションします",
-				},
-				{
-					Name:        "version",
-					Description: "バージョンを確認",
-					Type:        discordgo.ApplicationCommandOptionSubCommand,
-				},
-			},
-		},
-		{
-			Name: "husq set",
-			Type: discordgo.MessageApplicationCommand,
-		},
-		// {
-		// 	Name:        "civil",
-		// 	Description: "Hands up for civil war",
-		// 	Options: []*discordgo.ApplicationCommandOption{
-		// 		{
-		// 			Name:        "list",
-		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
-		// 			Description: "内戦イベントを取得します",
-		// 		},
-		// 		{
-		// 			Name:        "add",
-		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
-		// 			Description: "内戦イベントを追加",
-		// 		},
-		// 		{
-		// 			Name:        "remove",
-		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
-		// 			Description: "内戦イベントを削除",
-		// 		},
-		// 	},
-		// },
-		{
-			Name: "setコマンドに変換",
-			Type: discordgo.MessageApplicationCommand,
-		},
-		{
-			Name: "outコマンドに変換",
-			Type: discordgo.MessageApplicationCommand,
-		},
-	}
-
 	commandHandlers = map[string]func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository){
 		"husq set": handler.SetSQ,
 		"husq": func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
@@ -155,6 +79,7 @@ var (
 		},
 		"setコマンドに変換": handler.CreateSetCommands,
 		"outコマンドに変換": handler.CreateOutCommands,
+		"sheatを保存":   handler.HandleSaveResult,
 	}
 )
 
@@ -209,10 +134,11 @@ func main() {
 		log.Fatalf("Cannot open the session: %v", err)
 	}
 
-	registeredCommands := make([]*discordgo.ApplicationCommand, len(commands))
+	slashCommands := commands.GetCommands()
+	registeredCommands := make([]*discordgo.ApplicationCommand, len(slashCommands))
 	if *RemoveCommands {
 		log.Println("Adding commands...")
-		for i, v := range commands {
+		for i, v := range slashCommands {
 			cmd, err := s.ApplicationCommandCreate(s.State.User.ID, *GuildID, v)
 			if err != nil {
 				log.Panicf("Cannot create '%v' command: %v", v.Name, err)

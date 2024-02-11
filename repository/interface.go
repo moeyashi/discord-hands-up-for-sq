@@ -45,6 +45,7 @@ type SQ struct {
 }
 
 type Guild struct {
-	ID     string `firestore:"id"`
-	SQList []SQ   `firestore:"sqList"`
+	ID          string `firestore:"id"`
+	SQList      []SQ   `firestore:"sqList"`
+	Spreadsheet string `firestore:"spreadsheet"`
 }
