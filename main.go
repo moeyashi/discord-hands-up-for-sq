@@ -123,6 +123,10 @@ var (
 			Name: "outコマンドに変換",
 			Type: discordgo.MessageApplicationCommand,
 		},
+		{
+			Name: "sheatを保存",
+			Type: discordgo.MessageApplicationCommand,
+		},
 	}
 
 	commandHandlers = map[string]func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository){
@@ -155,6 +159,7 @@ var (
 		},
 		"setコマンドに変換": handler.CreateSetCommands,
 		"outコマンドに変換": handler.CreateOutCommands,
+		"sheatを保存":   handler.HandleSaveResult,
 	}
 )
 
