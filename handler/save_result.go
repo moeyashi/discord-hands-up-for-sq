@@ -49,7 +49,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 
 	if guild.Spreadsheet == "" {
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-			Content: "スプレッドシートが設定されていません。",
+			Content: "スプレッドシートが設定されていません。`/results url-set`でスプレッドシートを設定し、`discordbot@hands-up-for-sq.iam.gserviceaccount.com`に編集権限を付与してください。",
 		}); err != nil {
 			fmt.Println(err)
 			return

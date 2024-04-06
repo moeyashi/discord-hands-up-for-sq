@@ -121,6 +121,12 @@ func (r *firestoreRepository) PutSQMembers(ctx context.Context, guild *Guild, sq
 	return errors.New("not found")
 }
 
+func (r *firestoreRepository) PutResultsSpreadsheet(ctx context.Context, guild *Guild, spreadsheet string) error {
+	guild.Spreadsheet = spreadsheet
+	_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
+	return err
+}
+
 func (r *firestoreRepository) getGuildDocRef(guildID string) *firestore.DocumentRef {
 	return r.client.Collection(versionCollection).Doc(firestoreVersion).Collection(guildCollection).Doc(guildID)
 }
