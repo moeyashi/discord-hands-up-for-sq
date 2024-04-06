@@ -12,6 +12,7 @@ type Repository interface {
 	PutSQList(ctx context.Context, guild *Guild, sqList []SQ) error
 	GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error)
 	PutSQMembers(ctx context.Context, guild *Guild, sqTitle string, members []Member) error
+	PutResultsSpreadsheet(ctx context.Context, guild *Guild, spreadsheet string) error
 }
 
 type LoungeRepository interface {

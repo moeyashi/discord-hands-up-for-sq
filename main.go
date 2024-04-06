@@ -80,6 +80,17 @@ var (
 		"setコマンドに変換": handler.CreateSetCommands,
 		"outコマンドに変換": handler.CreateOutCommands,
 		"sheatを保存":   handler.HandleSaveResult,
+		"results": func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
+			options := i.ApplicationCommandData().Options
+			switch options[0].Name {
+			case "url":
+				handler.HandleResultsUrl(ctx, s, i, repository)
+				return
+			case "set-url":
+				handler.HandleResultsSetURL(ctx, s, i, repository)
+				return
+			}
+		},
 	}
 )
 
