@@ -24,7 +24,11 @@ func HandleLoungeSQInfo(ctx context.Context, s *discordgo.Session, m *discordgo.
 		return
 	}
 
-	sqList := sqListInFuture(m.Content, time.Now())
+	sqList := append(
+		filterSQListForDisplay(guild.SQList, time.Now()),
+		sqListInFuture(m.Content, time.Now())...,
+	)
+
 	if err := repo.PutSQList(ctx, guild, sqList); err != nil {
 		handleLoungeSQInfoError(s, m, err)
 		return
