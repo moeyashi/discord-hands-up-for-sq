@@ -408,3 +408,16 @@ func customIDToMemberType(customID string) repository.MemberTypes {
 func mogiRoleName(mogi *repository.Mogi) string {
 	return fmt.Sprintf("内戦 %s", mogi.Title())
 }
+
+func findMogiRole(s *discordgo.Session, guildID string, mogiRoleName string) (*discordgo.Role, error) {
+	roles, err := s.GuildRoles(guildID)
+	if err != nil {
+		return nil, err
+	}
+	for _, role := range roles {
+		if role.Name == mogiRoleName {
+			return role, nil
+		}
+	}
+	return nil, nil
+}

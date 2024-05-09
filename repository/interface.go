@@ -16,8 +16,8 @@ type Repository interface {
 	DeleteMogi(ctx context.Context, guild *Guild, mogiTitle string) error
 	GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error)
 	PutSQMembers(ctx context.Context, guild *Guild, sqTitle string, members []Member) error
-	GetMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time) ([]Member, error)
-	PutMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time, members []Member) error
+	GetMogiMembers(ctx context.Context, guild *Guild, mogiTitle string) ([]Member, error)
+	PutMogiMembers(ctx context.Context, guild *Guild, mogiTitle string, members []Member) error
 	PutResultsSpreadsheet(ctx context.Context, guild *Guild, spreadsheet string) error
 }
 

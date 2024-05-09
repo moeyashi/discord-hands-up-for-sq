@@ -6,7 +6,6 @@ import (
 	"log"
 	"os"
 	"slices"
-	"time"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/option"
@@ -160,18 +159,18 @@ func (r *firestoreRepository) PutSQMembers(ctx context.Context, guild *Guild, sq
 	return errors.New("not found")
 }
 
-func (r *firestoreRepository) GetMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time) ([]Member, error) {
+func (r *firestoreRepository) GetMogiMembers(ctx context.Context, guild *Guild, mogiTitle string) ([]Member, error) {
 	for _, mogi := range guild.MogiList {
-		if mogi.Timestamp == mogiTime {
+		if mogi.Title() == mogiTitle {
 			return mogi.Members, nil
 		}
 	}
 	return nil, errors.New("not found")
 }
 
-func (r *firestoreRepository) PutMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time, members []Member) error {
+func (r *firestoreRepository) PutMogiMembers(ctx context.Context, guild *Guild, mogiTitle string, members []Member) error {
 	for i, mogi := range guild.MogiList {
-		if mogi.Timestamp == mogiTime {
+		if mogi.Title() == mogiTitle {
 			guild.MogiList[i].Members = members
 			_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
 			return err

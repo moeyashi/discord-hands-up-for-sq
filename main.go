@@ -127,7 +127,7 @@ func init() {
 			} else if customID == "lounge_name_select" {
 				handler.HandleLoungeNameSelect(ctx, s, i, repository)
 			} else if strings.HasPrefix(customID, "button_mogi_") {
-				return
+				handler.HandleMogiButtonClick(ctx, s, i, repository)
 			} else if strings.HasPrefix(customID, "button_") {
 				handler.HandleClick(ctx, s, i, repository)
 			} else if customID == "mogi_remove_select" {

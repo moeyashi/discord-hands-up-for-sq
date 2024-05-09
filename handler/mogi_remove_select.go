@@ -37,12 +37,15 @@ func HandleMogiRemoveSelect(ctx context.Context, s *discordgo.Session, i *discor
 
 	// discord roleを削除
 	roleName := mogiRoleName(mogi)
-	roles, _ := s.GuildRoles(guild.ID)
-	for _, role := range roles {
-		if role.Name == roleName {
-			if err := s.GuildRoleDelete(guild.ID, role.ID); err != nil {
-				fmt.Println(err)
-			}
+	role, err := findMogiRole(s, i.GuildID, roleName)
+	if err != nil {
+		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		return
+	}
+	if role != nil {
+		if err := s.GuildRoleDelete(i.GuildID, role.ID); err != nil {
+			s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+			return
 		}
 	}
 
