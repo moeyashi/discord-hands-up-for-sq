@@ -91,6 +91,20 @@ var (
 				return
 			}
 		},
+		"mogi": func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
+			options := i.ApplicationCommandData().Options
+			switch options[0].Name {
+			case "list":
+				handler.HandleMogiList(ctx, s, i, repository)
+				return
+			case "set":
+				handler.HandleMogiSet(ctx, s, i, repository)
+				return
+			case "remove":
+				handler.HandleMogiRemove(ctx, s, i, repository)
+				return
+			}
+		},
 	}
 )
 
@@ -117,8 +131,12 @@ func init() {
 				handler.HandleSelect(ctx, s, i, repository)
 			} else if customID == "lounge_name_select" {
 				handler.HandleLoungeNameSelect(ctx, s, i, repository)
+			} else if strings.HasPrefix(customID, "button_mogi_") {
+				return
 			} else if strings.HasPrefix(customID, "button_") {
 				handler.HandleClick(ctx, s, i, repository)
+			} else if customID == "mogi_remove_select" {
+				handler.HandleMogiRemoveSelect(ctx, s, i, repository)
 			}
 		}
 	})

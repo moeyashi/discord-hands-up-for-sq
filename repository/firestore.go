@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"slices"
+	"time"
 
 	"cloud.google.com/go/firestore"
 	"google.golang.org/api/option"
@@ -101,6 +102,28 @@ func isContainsByTitle(sqList []SQ, title string) bool {
 	return false
 }
 
+func (r *firestoreRepository) GetMogiList(ctx context.Context, guild *Guild) ([]Mogi, error) {
+	return guild.MogiList, nil
+}
+
+func (r *firestoreRepository) AppendMogiList(ctx context.Context, guild *Guild, mogi Mogi) error {
+	guild.MogiList = append(guild.MogiList, mogi)
+	_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
+	return err
+}
+
+func (r *firestoreRepository) DeleteMogi(ctx context.Context, guild *Guild, mogiTitle string) error {
+	mogiList := []Mogi{}
+	for _, mogi := range guild.MogiList {
+		if mogi.Title() != mogiTitle {
+			mogiList = append(mogiList, mogi)
+		}
+	}
+	guild.MogiList = mogiList
+	_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
+	return err
+}
+
 func (r *firestoreRepository) GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error) {
 	for _, sq := range guild.SQList {
 		if sq.Title == sqTitle {
@@ -114,6 +137,26 @@ func (r *firestoreRepository) PutSQMembers(ctx context.Context, guild *Guild, sq
 	for i, sq := range guild.SQList {
 		if sq.Title == sqTitle {
 			guild.SQList[i].Members = members
+			_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
+			return err
+		}
+	}
+	return errors.New("not found")
+}
+
+func (r *firestoreRepository) GetMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time) ([]Member, error) {
+	for _, mogi := range guild.MogiList {
+		if mogi.Timestamp == mogiTime {
+			return mogi.Members, nil
+		}
+	}
+	return nil, errors.New("not found")
+}
+
+func (r *firestoreRepository) PutMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time, members []Member) error {
+	for i, mogi := range guild.MogiList {
+		if mogi.Timestamp == mogiTime {
+			guild.MogiList[i].Members = members
 			_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
 			return err
 		}

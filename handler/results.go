@@ -49,7 +49,7 @@ func HandleResultsSetURL(ctx context.Context, s *discordgo.Session, i *discordgo
 		fmt.Println(err)
 	}
 
-	url := i.ApplicationCommandData().Options[0].StringValue()
+	url := i.ApplicationCommandData().Options[0].Options[0].StringValue()
 
 	guild, err := repository.GetGuild(ctx, i.GuildID)
 	if err != nil {

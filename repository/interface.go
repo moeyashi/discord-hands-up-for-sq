@@ -10,8 +10,13 @@ type Repository interface {
 	GetGuild(ctx context.Context, guildID string) (*Guild, error)
 	GetSQList(ctx context.Context, guild *Guild) ([]SQ, error)
 	PutSQList(ctx context.Context, guild *Guild, sqList []SQ) error
+	GetMogiList(ctx context.Context, guild *Guild) ([]Mogi, error)
+	AppendMogiList(ctx context.Context, guild *Guild, mogi Mogi) error
+	DeleteMogi(ctx context.Context, guild *Guild, mogiTitle string) error
 	GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error)
 	PutSQMembers(ctx context.Context, guild *Guild, sqTitle string, members []Member) error
+	GetMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time) ([]Member, error)
+	PutMogiMembers(ctx context.Context, guild *Guild, mogiTime time.Time, members []Member) error
 	PutResultsSpreadsheet(ctx context.Context, guild *Guild, spreadsheet string) error
 }
 
@@ -45,8 +50,34 @@ type SQ struct {
 	Timestamp time.Time `firestore:"timestamp"`
 }
 
+type Mogi struct {
+	Timestamp time.Time `firestore:"timestamp"`
+	Members   []Member  `firestore:"members"`
+}
+
 type Guild struct {
 	ID          string `firestore:"id"`
 	SQList      []SQ   `firestore:"sqList"`
 	Spreadsheet string `firestore:"spreadsheet"`
+	MogiList    []Mogi `firestore:"mogiList"`
+}
+
+func (mogi Mogi) Title() string {
+	return mogi.Timestamp.Format("01月02日 15時")
+}
+
+func MakeMogi(now time.Time, month, date, hour int64) *Mogi {
+	year := nextYear(now, month, date)
+	mogiTimestamp := time.Date(year, time.Month(month-1), int(date), int(hour), 0, 0, 0, time.Local)
+	return &Mogi{
+		Timestamp: mogiTimestamp,
+	}
+}
+
+// 次にその月日を持つ年を返す
+func nextYear(now time.Time, month, date int64) int {
+	if month-1 < int64(now.Month()) || (month-1 == int64(now.Month()) && date < int64(now.Day())) {
+		return now.Year() + 1
+	}
+	return now.Year()
 }

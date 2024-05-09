@@ -49,27 +49,53 @@ func GetCommands() []*discordgo.ApplicationCommand {
 			Name: "husq set",
 			Type: discordgo.MessageApplicationCommand,
 		},
-		// {
-		// 	Name:        "civil",
-		// 	Description: "Hands up for civil war",
-		// 	Options: []*discordgo.ApplicationCommandOption{
-		// 		{
-		// 			Name:        "list",
-		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
-		// 			Description: "内戦イベントを取得します",
-		// 		},
-		// 		{
-		// 			Name:        "add",
-		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
-		// 			Description: "内戦イベントを追加",
-		// 		},
-		// 		{
-		// 			Name:        "remove",
-		// 			Type:        discordgo.ApplicationCommandOptionSubCommand,
-		// 			Description: "内戦イベントを削除",
-		// 		},
-		// 	},
-		// },
+		{
+			Name:        "mogi",
+			Description: "Hands up for civil war",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "list",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "内戦イベントを取得します",
+				},
+				{
+					Name:        "set",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "内戦イベントを追加",
+					Options: []*discordgo.ApplicationCommandOption{
+						{
+							Name:        "month",
+							Type:        discordgo.ApplicationCommandOptionInteger,
+							Description: "月",
+							Required:    true,
+							MinValue:    makeFloat64(1),
+							MaxValue:    float64(12),
+						},
+						{
+							Name:        "date",
+							Type:        discordgo.ApplicationCommandOptionInteger,
+							Description: "日",
+							Required:    true,
+							MinValue:    makeFloat64(1),
+							MaxValue:    float64(31),
+						},
+						{
+							Name:        "hour",
+							Type:        discordgo.ApplicationCommandOptionInteger,
+							Description: "時",
+							Required:    false,
+							MinValue:    makeFloat64(1),
+							MaxValue:    float64(24),
+						},
+					},
+				},
+				{
+					Name:        "remove",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "内戦イベントを削除",
+				},
+			},
+		},
 		{
 			Name: "sheatを保存",
 			Type: discordgo.MessageApplicationCommand,
@@ -99,4 +125,9 @@ func GetCommands() []*discordgo.ApplicationCommand {
 			},
 		},
 	}
+}
+
+func makeFloat64(i int) *float64 {
+	f := float64(i)
+	return &f
 }

@@ -61,7 +61,6 @@ func HandleSelect(ctx context.Context, s *discordgo.Session, i *discordgo.Intera
 		UserName:   userName,
 		MemberType: memberType,
 	})
-	responseMessage := fmt.Sprintf("%s を %s に追加しました。", userName, sqTitle)
 	if err := repository.PutSQMembers(ctx, guild, sqTitle, members); err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Flags:   discordgo.MessageFlagsEphemeral,
@@ -79,6 +78,7 @@ func HandleSelect(ctx context.Context, s *discordgo.Session, i *discordgo.Intera
 		})
 		return
 	}
+	responseMessage := fmt.Sprintf("%s を %s に追加しました。", userName, sqTitle)
 	_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 		Content:    responseMessage,
 		Embeds:     res.Data.Embeds,
