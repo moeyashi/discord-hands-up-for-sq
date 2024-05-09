@@ -83,7 +83,7 @@ func GetCommands() []*discordgo.ApplicationCommand {
 							Name:        "hour",
 							Type:        discordgo.ApplicationCommandOptionInteger,
 							Description: "時",
-							Required:    false,
+							Required:    true,
 							MinValue:    makeFloat64(1),
 							MaxValue:    float64(24),
 						},

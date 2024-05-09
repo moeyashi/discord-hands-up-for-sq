@@ -22,14 +22,12 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		fmt.Println(err)
 	}
 
-	month := i.ApplicationCommandData().Options[0].Options[0].IntValue()
-	date := i.ApplicationCommandData().Options[0].Options[1].IntValue()
-	hour := int64(0)
-	if len(i.ApplicationCommandData().Options[0].Options) == 3 {
-		hour = i.ApplicationCommandData().Options[0].Options[2].IntValue()
-	}
-
-	mogi := repository.MakeMogi(time.Now(), month, date, hour)
+	mogi := repository.MakeMogi(
+		time.Now(),
+		i.ApplicationCommandData().Options[0].Options[0].IntValue(),
+		i.ApplicationCommandData().Options[0].Options[1].IntValue(),
+		i.ApplicationCommandData().Options[0].Options[2].IntValue(),
+	)
 	err = repo.AppendMogiList(ctx, guild, *mogi)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
