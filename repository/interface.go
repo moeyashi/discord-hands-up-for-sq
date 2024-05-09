@@ -11,6 +11,7 @@ type Repository interface {
 	GetSQList(ctx context.Context, guild *Guild) ([]SQ, error)
 	PutSQList(ctx context.Context, guild *Guild, sqList []SQ) error
 	GetMogiList(ctx context.Context, guild *Guild) ([]Mogi, error)
+	GetMogi(ctx context.Context, guild *Guild, mogiTitle string) (*Mogi, error)
 	AppendMogiList(ctx context.Context, guild *Guild, mogi Mogi) error
 	DeleteMogi(ctx context.Context, guild *Guild, mogiTitle string) error
 	GetSQMembers(ctx context.Context, guild *Guild, sqTitle string) ([]Member, error)

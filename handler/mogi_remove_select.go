@@ -24,10 +24,26 @@ func HandleMogiRemoveSelect(ctx context.Context, s *discordgo.Session, i *discor
 	}
 
 	mogiTitle := i.MessageComponentData().Values[0]
+	mogi, err := repo.GetMogi(ctx, guild, mogiTitle)
+	if err != nil {
+		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		return
+	}
 	err = repo.DeleteMogi(ctx, guild, mogiTitle)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
 		return
+	}
+
+	// discord roleを削除
+	roleName := mogiRoleName(mogi)
+	roles, _ := s.GuildRoles(guild.ID)
+	for _, role := range roles {
+		if role.Name == roleName {
+			if err := s.GuildRoleDelete(guild.ID, role.ID); err != nil {
+				fmt.Println(err)
+			}
+		}
 	}
 
 	// メッセージの作成

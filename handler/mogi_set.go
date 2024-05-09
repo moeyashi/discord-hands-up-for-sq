@@ -16,6 +16,12 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		return
 	}
 
+	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
+		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
+	}); err != nil {
+		fmt.Println(err)
+	}
+
 	month := i.ApplicationCommandData().Options[0].Options[0].IntValue()
 	date := i.ApplicationCommandData().Options[0].Options[1].IntValue()
 	hour := int64(0)
@@ -23,15 +29,36 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		hour = i.ApplicationCommandData().Options[0].Options[2].IntValue()
 	}
 
-	repo.AppendMogiList(ctx, guild, *repository.MakeMogi(time.Now(), month, date, hour))
-
-	res, err := createMogiListInteractionResponse(guild.MogiList)
+	mogi := repository.MakeMogi(time.Now(), month, date, hour)
+	err = repo.AppendMogiList(ctx, guild, *mogi)
 	if err != nil {
-		s.InteractionRespond(i.Interaction, makeErrorResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
 		return
 	}
 
-	if err := s.InteractionRespond(i.Interaction, res); err != nil {
+	// discordのロールを作成する
+	// ロール名は「内戦:月/日」
+	mentionable := true
+	_, err = s.GuildRoleCreate(i.GuildID, &discordgo.RoleParams{
+		Name:        mogiRoleName(mogi),
+		Mentionable: &mentionable,
+	})
+	if err != nil {
+		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		return
+	}
+
+	res, err := createMogiListInteractionResponse(guild.MogiList)
+	if err != nil {
+		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		return
+	}
+
+	if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
+		Content:    res.Data.Content,
+		Embeds:     res.Data.Embeds,
+		Components: res.Data.Components,
+	}); err != nil {
 		fmt.Println(err)
 		return
 	}

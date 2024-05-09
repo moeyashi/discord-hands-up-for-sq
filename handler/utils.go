@@ -402,3 +402,7 @@ func customIDToMemberType(customID string) repository.MemberTypes {
 		return repository.MemberTypesParticipant
 	}
 }
+
+func mogiRoleName(mogi *repository.Mogi) string {
+	return fmt.Sprintf("内戦 %s", mogi.Title())
+}
