@@ -59,7 +59,7 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		Embeds:     res.Data.Embeds,
 		Components: res.Data.Components,
 	}); err != nil {
-		fmt.Println(err)
+		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
 		return
 	}
 

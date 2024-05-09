@@ -116,6 +116,13 @@ func (r *firestoreRepository) GetMogi(ctx context.Context, guild *Guild, mogiTit
 }
 
 func (r *firestoreRepository) AppendMogiList(ctx context.Context, guild *Guild, mogi Mogi) error {
+	// すでに存在するかチェック
+	for _, m := range guild.MogiList {
+		if m.Title() == mogi.Title() {
+			return nil
+		}
+	}
+
 	guild.MogiList = append(guild.MogiList, mogi)
 	_, err := r.getGuildDocRef(guild.ID).Set(ctx, guild)
 	return err

@@ -1,18 +1,13 @@
 package main
 
 import (
-	// "errors"
 	"context"
 	"flag"
 	"strings"
 
-	// "fmt"
 	"log"
 	"os"
 	"os/signal"
-
-	// "strings"
-	// "time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/moeyashi/discord-hands-up-for-sq/commands"

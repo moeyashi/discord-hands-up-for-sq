@@ -14,6 +14,7 @@ import (
 )
 
 func makeErrorResponse(err error) *discordgo.InteractionResponse {
+	fmt.Println(err)
 	return &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseChannelMessageWithSource,
 		Data: &discordgo.InteractionResponseData{
@@ -24,6 +25,7 @@ func makeErrorResponse(err error) *discordgo.InteractionResponse {
 }
 
 func makeErrorFollowupResponse(err error) *discordgo.WebhookParams {
+	fmt.Println(err)
 	return &discordgo.WebhookParams{
 		Flags:   discordgo.MessageFlagsEphemeral,
 		Content: fmt.Sprint(err),
