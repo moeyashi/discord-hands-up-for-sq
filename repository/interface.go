@@ -63,13 +63,15 @@ type Guild struct {
 	MogiList    []Mogi `firestore:"mogiList"`
 }
 
+var jst = time.FixedZone("Asia/Tokyo", 9*60*60)
+
 func (mogi Mogi) Title() string {
-	return mogi.Timestamp.Format("01月02日 15時")
+	return mogi.Timestamp.In(jst).Format("01月02日 15時")
 }
 
 func MakeMogi(now time.Time, month, date, hour int64) *Mogi {
 	year := nextYear(now, month, date)
-	mogiTimestamp := time.Date(year, time.Month(month-1), int(date), int(hour), 0, 0, 0, time.Local)
+	mogiTimestamp := time.Date(year, time.Month(month), int(date), int(hour), 0, 0, 0, jst)
 	return &Mogi{
 		Timestamp: mogiTimestamp,
 	}
@@ -77,7 +79,7 @@ func MakeMogi(now time.Time, month, date, hour int64) *Mogi {
 
 // 次にその月日を持つ年を返す
 func nextYear(now time.Time, month, date int64) int {
-	if month-1 < int64(now.Month()) || (month-1 == int64(now.Month()) && date < int64(now.Day())) {
+	if month < int64(now.Month()) || (month == int64(now.Month()) && date < int64(now.Day())) {
 		return now.Year() + 1
 	}
 	return now.Year()
