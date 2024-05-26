@@ -110,70 +110,6 @@ func filterSQListForDisplay(sqList []repository.SQ, now time.Time) []repository.
 	return filteredSQList
 }
 
-func createSQListInteractionResponse(sqList []repository.SQ, now time.Time) (*discordgo.InteractionResponse, error) {
-	embedFields := []*discordgo.MessageEmbedField{}
-	components := []discordgo.MessageComponent{}
-
-	filteredSQList := filterSQListForDisplay(sqList, now)
-
-	for _, sq := range filteredSQList {
-		embedFieldsValue := "なし"
-		userNames := []string{}
-		for _, member := range sq.Members {
-			userName := member.UserName
-			if member.MemberType == repository.MemberTypesTemporary {
-				userName = userName + "(仮)"
-			} else if member.MemberType == repository.MemberTypesSub {
-				userName = userName + "(sub)"
-			}
-			userNames = append(userNames, userName)
-		}
-		if len(userNames) > 0 {
-			embedFieldsValue = strings.Join(userNames, ",")
-		}
-
-		embedFields = append(embedFields, &discordgo.MessageEmbedField{
-			Name:  makeSQListEmbedFieldName(sq),
-			Value: embedFieldsValue,
-		})
-		components = append(components, discordgo.Button{
-			CustomID: "button_" + sq.Title,
-			Label:    sq.Title,
-			Style:    discordgo.SecondaryButton,
-		})
-	}
-
-	// componentsが5つまでしか入らないため、5つごとにRowを分ける
-	actionsRows := []discordgo.ActionsRow{}
-	for index, component := range components {
-		if index%5 == 0 {
-			actionsRows = append(actionsRows, discordgo.ActionsRow{})
-		}
-		actionsRows[len(actionsRows)-1].Components = append(actionsRows[len(actionsRows)-1].Components, component)
-	}
-
-	rows := []discordgo.MessageComponent{}
-	for _, actionsRow := range actionsRows {
-		rows = append(rows, actionsRow)
-	}
-
-	ret := &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Content: "SQリスト",
-		},
-	}
-	if len(embedFields) != 0 {
-		ret.Data.Embeds = []*discordgo.MessageEmbed{{Fields: embedFields}}
-	} else {
-		ret.Data.Content = "SQリストはありません。\nsq-infoのメッセージから`husq set`コマンドを実行してSQリストを設定してください。"
-	}
-	if len(rows) != 0 {
-		ret.Data.Components = rows
-	}
-	return ret, nil
-}
-
 func createMogiListInteractionResponse(mogiList []repository.Mogi) (*discordgo.InteractionResponse, error) {
 	embedFields := []*discordgo.MessageEmbedField{}
 	components := []discordgo.MessageComponent{}
@@ -300,42 +236,6 @@ func makeMogiListEmbedFieldName(
 	return fmt.Sprintf("%s (%s)", mogi.Title(), strings.Join(members, ", "))
 }
 
-type SQListSelectCustomID string
-
-const (
-	SQListSelectCustomIDCan  SQListSelectCustomID = "can_select"
-	SQListSelectCustomIDTemp SQListSelectCustomID = "temp_select"
-	SQListSelectCustomIDSub  SQListSelectCustomID = "sub_select"
-)
-
-func makeSQListSelect(userID string, sqList []repository.SQ, customID SQListSelectCustomID, now time.Time) *discordgo.SelectMenu {
-	filteredSQList := filterSQListForDisplay(sqList, now)
-	memberType := customIDToMemberType(string(customID))
-	options := []discordgo.SelectMenuOption{}
-	for _, sq := range filteredSQList {
-		if indexOfSameRegistered(sq.Members, userID, memberType) >= 0 {
-			continue
-		}
-		options = append(options, discordgo.SelectMenuOption{
-			Label: sq.Title,
-			Value: sq.Title,
-		})
-	}
-	return &discordgo.SelectMenu{
-		CustomID: string(customID),
-		Options:  options,
-	}
-}
-
-func indexOfSameRegistered(members []repository.Member, userID string, memberType repository.MemberTypes) int {
-	for index, member := range members {
-		if member.UserID == userID && member.MemberType == memberType {
-			return index
-		}
-	}
-	return -1
-}
-
 func indexOfSameMember(members []repository.Member, userID string) int {
 	for index, member := range members {
 		if member.UserID == userID {
@@ -371,19 +271,6 @@ func getDisplayUsername(member *discordgo.Member) string {
 		userName = member.User.Username
 	}
 	return userName
-}
-
-func customIDToMemberType(customID string) repository.MemberTypes {
-	switch customID {
-	case string(SQListSelectCustomIDCan):
-		return repository.MemberTypesParticipant
-	case string(SQListSelectCustomIDTemp):
-		return repository.MemberTypesTemporary
-	case string(SQListSelectCustomIDSub):
-		return repository.MemberTypesSub
-	default:
-		return repository.MemberTypesParticipant
-	}
 }
 
 func mogiRoleName(mogi *repository.Mogi) string {

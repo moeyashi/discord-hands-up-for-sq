@@ -6,22 +6,24 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/constant"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
 func HandleCan(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
-	handleHandsUp(ctx, s, i, repository, SQListSelectCustomIDCan)
+	handleHandsUp(ctx, s, i, repository, constant.SQListSelectCustomIDCan)
 }
 
 func HandleTemp(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
-	handleHandsUp(ctx, s, i, repository, SQListSelectCustomIDTemp)
+	handleHandsUp(ctx, s, i, repository, constant.SQListSelectCustomIDTemp)
 }
 
 func HandleSub(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
-	handleHandsUp(ctx, s, i, repository, SQListSelectCustomIDSub)
+	handleHandsUp(ctx, s, i, repository, constant.SQListSelectCustomIDSub)
 }
 
-func handleHandsUp(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository, handsUpType SQListSelectCustomID) {
+func handleHandsUp(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository, handsUpType constant.SQListSelectCustomID) {
 	guild, err := repository.GetGuild(ctx, i.GuildID)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
@@ -41,7 +43,7 @@ func handleHandsUp(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 			Components: []discordgo.MessageComponent{
 				discordgo.ActionsRow{
 					Components: []discordgo.MessageComponent{
-						makeSQListSelect(i.Member.User.ID, guild.SQList, handsUpType, time.Now()),
+						response.MakeSQListSelect(i.Member.User.ID, guild.SQList, handsUpType, time.Now()),
 					},
 				},
 			},
