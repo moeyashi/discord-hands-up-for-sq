@@ -16,7 +16,7 @@ func HandleMogiList(ctx context.Context, s *discordgo.Session, i *discordgo.Inte
 		return
 	}
 
-	res, err := createMogiListInteractionResponse(guild.MogiList)
+	res, err := response.MakeMogiListInteractionResponse(guild.MogiList)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, response.MakeErrorInteractionResponse(err))
 		return

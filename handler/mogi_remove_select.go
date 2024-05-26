@@ -51,7 +51,7 @@ func HandleMogiRemoveSelect(ctx context.Context, s *discordgo.Session, i *discor
 	}
 
 	// メッセージの作成
-	res, err := createMogiListInteractionResponse(guild.MogiList)
+	res, err := response.MakeMogiListInteractionResponse(guild.MogiList)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return

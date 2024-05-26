@@ -47,7 +47,7 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		return
 	}
 
-	res, err := createMogiListInteractionResponse(guild.MogiList)
+	res, err := response.MakeMogiListInteractionResponse(guild.MogiList)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
