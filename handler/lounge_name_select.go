@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
-	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
+	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
-func HandleLoungeNameSelect(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository _repo.Repository) {
+func HandleLoungeNameSelect(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repo repository.Repository) {
 	// 選択肢を使用不可にする
 	s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseUpdateMessage,
@@ -17,58 +18,42 @@ func HandleLoungeNameSelect(ctx context.Context, s *discordgo.Session, i *discor
 		},
 	})
 
-	guild, err := repository.GetGuild(ctx, i.GuildID)
+	guild, err := repo.GetGuild(ctx, i.GuildID)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-			Flags:   discordgo.MessageFlagsEphemeral,
-			Content: fmt.Sprint(err),
-		})
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
 	sqTitle := i.MessageComponentData().Values[0]
 
 	// SQ Member の取得
-	members, err := repository.GetSQMembers(ctx, guild, sqTitle)
+	members, err := repo.GetSQMembers(ctx, guild, sqTitle)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-			Flags:   discordgo.MessageFlagsEphemeral,
-			Content: fmt.Sprint(err),
-		})
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
-	loungeRepo, err := _repo.NewLoungeRepository()
+	loungeRepo, err := repository.NewLoungeRepository()
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-			Flags:   discordgo.MessageFlagsEphemeral,
-			Content: fmt.Sprint(err),
-		})
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
-	embedFields := []*discordgo.MessageEmbedField{}
+	items := []response.MakeLoungeNameResponseWebhookParamsParameterItem{}
 	for _, member := range members {
 		// Discordのユーザー名を取得
 		nameForLounge, err := loungeRepo.GetLoungeName(ctx, member.UserID)
 		if err != nil {
-			s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-				Flags:   discordgo.MessageFlagsEphemeral,
-				Content: fmt.Sprint(err),
-			})
+			s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 			return
 		}
-		nameForGuild := member.UserName
-		embedFields = append(embedFields, &discordgo.MessageEmbedField{
-			Name:  nameForGuild,
-			Value: nameForLounge.Name,
+		items = append(items, response.MakeLoungeNameResponseWebhookParamsParameterItem{
+			Member:     member,
+			LoungeName: nameForLounge,
 		})
 	}
 
-	_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-		Content: "Loungeサーバーでの名前",
-		Embeds:  []*discordgo.MessageEmbed{{Fields: embedFields}},
-	})
+	_, err = s.FollowupMessageCreate(i.Interaction, true, response.MakeLoungeNameResponseWebhookParams(items))
 	if err != nil {
 		fmt.Println(err)
 	}

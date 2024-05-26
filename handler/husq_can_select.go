@@ -6,6 +6,8 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/constant"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
@@ -18,7 +20,7 @@ func HandleSelect(ctx context.Context, s *discordgo.Session, i *discordgo.Intera
 		},
 	})
 
-	memberType := customIDToMemberType(i.MessageComponentData().CustomID)
+	memberType := constant.SQListSelectCustomIDFromString(i.MessageComponentData().CustomID).ToMemberTypes()
 	guild, err := repository.GetGuild(ctx, i.GuildID)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
@@ -40,7 +42,7 @@ func HandleSelect(ctx context.Context, s *discordgo.Session, i *discordgo.Intera
 		return
 	}
 
-	existsSameIndex := indexOfSameRegistered(members, i.Member.User.ID, memberType)
+	existsSameIndex := _repo.IndexOfSameRegistered(members, i.Member.User.ID, memberType)
 	if existsSameIndex >= 0 {
 		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Flags:   discordgo.MessageFlagsEphemeral,
@@ -70,7 +72,7 @@ func HandleSelect(ctx context.Context, s *discordgo.Session, i *discordgo.Intera
 	}
 
 	// メッセージの作成
-	res, err := createSQListInteractionResponse(guild.SQList, time.Now())
+	res, err := response.MakeSQListInteractionResponse(guild.SQList, time.Now())
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 			Flags:   discordgo.MessageFlagsEphemeral,

@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
@@ -13,7 +14,7 @@ func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discord
 
 	guild, err := repository.GetGuild(ctx, i.GuildID)
 	if err != nil {
-		s.InteractionRespond(i.Interaction, makeErrorResponse(err))
+		s.InteractionRespond(i.Interaction, response.MakeErrorInteractionResponse(err))
 		return
 	}
 
@@ -26,14 +27,14 @@ func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discord
 	mogiTitle := strings.Split(i.MessageComponentData().CustomID, "button_mogi_")[1]
 	mogi, err := repository.GetMogi(ctx, guild, mogiTitle)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
 	// Mogi Member の取得
 	members, err := repository.GetMogiMembers(ctx, guild, mogiTitle)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
@@ -41,7 +42,7 @@ func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discord
 	roleName := mogiRoleName(mogi)
 	role, err := findMogiRole(s, i.GuildID, roleName)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
@@ -55,7 +56,7 @@ func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discord
 			responseMessage = fmt.Sprintf("%s を %s から外しました。", userName, mogiTitle)
 			if role != nil {
 				if err := s.GuildMemberRoleRemove(i.GuildID, member.UserID, role.ID); err != nil {
-					s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+					s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 					return
 				}
 			}
@@ -71,20 +72,20 @@ func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discord
 		responseMessage = fmt.Sprintf("%s を %s に追加しました。", userName, mogiTitle)
 		if role != nil {
 			if err := s.GuildMemberRoleAdd(i.GuildID, i.Member.User.ID, role.ID); err != nil {
-				s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+				s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 				return
 			}
 		}
 	}
 	if err := repository.PutMogiMembers(ctx, guild, mogiTitle, members); err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
 	// メッセージの作成
-	res, err := createMogiListInteractionResponse(guild.MogiList)
+	res, err := response.MakeMogiListInteractionResponse(guild.MogiList)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 	res.Data.Content = responseMessage

@@ -6,13 +6,14 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
 func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repo repository.Repository) {
 	guild, err := repo.GetGuild(ctx, i.GuildID)
 	if err != nil {
-		s.InteractionRespond(i.Interaction, makeErrorResponse(err))
+		s.InteractionRespond(i.Interaction, response.MakeErrorInteractionResponse(err))
 		return
 	}
 
@@ -30,7 +31,7 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 	)
 	err = repo.AppendMogiList(ctx, guild, *mogi)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
@@ -42,13 +43,13 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		Mentionable: &mentionable,
 	})
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
-	res, err := createMogiListInteractionResponse(guild.MogiList)
+	res, err := response.MakeMogiListInteractionResponse(guild.MogiList)
 	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
@@ -57,7 +58,7 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 		Embeds:     res.Data.Embeds,
 		Components: res.Data.Components,
 	}); err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, makeErrorFollowupResponse(err))
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 

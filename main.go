@@ -12,6 +12,7 @@ import (
 	"github.com/bwmarrin/discordgo"
 	"github.com/moeyashi/discord-hands-up-for-sq/commands"
 	"github.com/moeyashi/discord-hands-up-for-sq/handler"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/constant"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
@@ -118,11 +119,11 @@ func init() {
 			}
 		case discordgo.InteractionMessageComponent:
 			customID := i.MessageComponentData().CustomID
-			if customID == string(handler.SQListSelectCustomIDCan) {
+			if customID == string(constant.SQListSelectCustomIDCan) {
 				handler.HandleSelect(ctx, s, i, repository)
-			} else if customID == string(handler.SQListSelectCustomIDTemp) {
+			} else if customID == string(constant.SQListSelectCustomIDTemp) {
 				handler.HandleSelect(ctx, s, i, repository)
-			} else if customID == string(handler.SQListSelectCustomIDSub) {
+			} else if customID == string(constant.SQListSelectCustomIDSub) {
 				handler.HandleSelect(ctx, s, i, repository)
 			} else if customID == "lounge_name_select" {
 				handler.HandleLoungeNameSelect(ctx, s, i, repository)

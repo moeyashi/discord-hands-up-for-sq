@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
@@ -83,7 +84,7 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 	}
 
 	// メッセージの作成
-	res, err := createSQListInteractionResponse(guild.SQList, time.Now())
+	res, err := response.MakeSQListInteractionResponse(guild.SQList, time.Now())
 	if err != nil {
 		s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 			Type: discordgo.InteractionResponseChannelMessageWithSource,

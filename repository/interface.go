@@ -22,11 +22,12 @@ type Repository interface {
 }
 
 type LoungeRepository interface {
-	GetLoungeName(ctx context.Context, userID string) (*getLoungeNameResponse, error)
+	GetLoungeName(ctx context.Context, userID string) (*GetLoungeNameResponse, error)
 }
 
-type getLoungeNameResponse struct {
+type GetLoungeNameResponse struct {
 	Name string `json:"name"`
+	MMR  int    `json:"mmr"`
 }
 
 type MemberTypes int
