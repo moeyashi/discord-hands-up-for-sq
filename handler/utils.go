@@ -13,25 +13,6 @@ import (
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
-func makeErrorResponse(err error) *discordgo.InteractionResponse {
-	fmt.Println(err)
-	return &discordgo.InteractionResponse{
-		Type: discordgo.InteractionResponseChannelMessageWithSource,
-		Data: &discordgo.InteractionResponseData{
-			Flags:   discordgo.MessageFlagsEphemeral,
-			Content: fmt.Sprint(err),
-		},
-	}
-}
-
-func makeErrorFollowupResponse(err error) *discordgo.WebhookParams {
-	fmt.Println(err)
-	return &discordgo.WebhookParams{
-		Flags:   discordgo.MessageFlagsEphemeral,
-		Content: fmt.Sprint(err),
-	}
-}
-
 func sqListInFuture(sqInfo string, now time.Time) []repository.SQ {
 	jst, err := time.LoadLocation("Asia/Tokyo")
 	if err != nil {

@@ -4,19 +4,20 @@ import (
 	"context"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
 func HandleMogiRemove(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
 	guild, err := repository.GetGuild(ctx, i.GuildID)
 	if err != nil {
-		s.InteractionRespond(i.Interaction, makeErrorResponse(err))
+		s.InteractionRespond(i.Interaction, response.MakeErrorInteractionResponse(err))
 		return
 	}
 
 	mogiList, err := repository.GetMogiList(ctx, guild)
 	if err != nil {
-		s.InteractionRespond(i.Interaction, makeErrorResponse(err))
+		s.InteractionRespond(i.Interaction, response.MakeErrorInteractionResponse(err))
 		return
 	}
 	options := []discordgo.SelectMenuOption{}
@@ -45,7 +46,7 @@ func HandleMogiRemove(ctx context.Context, s *discordgo.Session, i *discordgo.In
 	})
 
 	if err != nil {
-		s.InteractionRespond(i.Interaction, makeErrorResponse(err))
+		s.InteractionRespond(i.Interaction, response.MakeErrorInteractionResponse(err))
 		return
 	}
 }
