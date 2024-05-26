@@ -13,7 +13,7 @@ func NewLoungeRepository() (LoungeRepository, error) {
 	return loungeRepository{}, nil
 }
 
-func (r loungeRepository) GetLoungeName(ctx context.Context, userID string) (*getLoungeNameResponse, error) {
+func (r loungeRepository) GetLoungeName(ctx context.Context, userID string) (*GetLoungeNameResponse, error) {
 	res, err := http.Get(r.getURLPlayerFromDiscord(userID))
 	if err != nil {
 		return nil, err
@@ -21,7 +21,7 @@ func (r loungeRepository) GetLoungeName(ctx context.Context, userID string) (*ge
 	defer res.Body.Close()
 	body, _ := io.ReadAll(res.Body)
 
-	var response getLoungeNameResponse
+	var response GetLoungeNameResponse
 	json.Unmarshal(body, &response)
 	return &response, nil
 }
