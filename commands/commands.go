@@ -94,6 +94,21 @@ func GetCommands() []*discordgo.ApplicationCommand {
 					Type:        discordgo.ApplicationCommandOptionSubCommand,
 					Description: "内戦イベントを削除",
 				},
+				{
+					Name:        "can",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "内戦イベントに参加します",
+				},
+				{
+					Name:        "temp",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "内戦イベントに仮参加します",
+				},
+				{
+					Name:        "sub",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Description: "内戦イベントに補欠参加します",
+				},
 			},
 		},
 		{

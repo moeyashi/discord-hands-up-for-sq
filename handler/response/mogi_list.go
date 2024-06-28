@@ -5,6 +5,7 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/handler/constant"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
 
@@ -100,4 +101,22 @@ func makeMogiListEmbedFieldName(
 		return mogi.Title()
 	}
 	return fmt.Sprintf("%s (%s)", mogi.Title(), strings.Join(members, ", "))
+}
+
+func MakeMogiListSelect(userID string, mogiList []repository.Mogi, customID constant.MogiListSelectCustomID) *discordgo.SelectMenu {
+	memberType := customID.ToMemberTypes()
+	options := []discordgo.SelectMenuOption{}
+	for _, mogi := range mogiList {
+		if repository.IndexOfSameRegistered(mogi.Members, userID, memberType) >= 0 {
+			continue
+		}
+		options = append(options, discordgo.SelectMenuOption{
+			Label: mogi.Title(),
+			Value: mogi.Title(),
+		})
+	}
+	return &discordgo.SelectMenu{
+		CustomID: string(customID),
+		Options:  options,
+	}
 }

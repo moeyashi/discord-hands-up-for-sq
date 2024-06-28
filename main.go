@@ -99,6 +99,15 @@ var (
 			case "remove":
 				handler.HandleMogiRemove(ctx, s, i, repository)
 				return
+			case "can":
+				handler.HandleMogiCan(ctx, s, i, repository)
+				return
+			case "temp":
+				handler.HandleMogiTemp(ctx, s, i, repository)
+				return
+			case "sub":
+				handler.HandleMogiSub(ctx, s, i, repository)
+				return
 			}
 		},
 	}
@@ -133,6 +142,8 @@ func init() {
 				handler.HandleClick(ctx, s, i, repository)
 			} else if customID == "mogi_remove_select" {
 				handler.HandleMogiRemoveSelect(ctx, s, i, repository)
+			} else if strings.HasPrefix(customID, "mogi_select_") {
+				handler.HandleMogiSelect(ctx, s, i, repository)
 			}
 		}
 	})
