@@ -35,3 +35,37 @@ func (c SQListSelectCustomID) ToMemberTypes() repository.MemberTypes {
 		return repository.MemberTypesParticipant
 	}
 }
+
+type MogiListSelectCustomID string
+
+const (
+	MogiListSelectCustomIDCan  MogiListSelectCustomID = "mogi_select_can"
+	MogiListSelectCustomIDTemp MogiListSelectCustomID = "mogi_select_temp"
+	MogiListSelectCustomIDSub  MogiListSelectCustomID = "mogi_select_sub"
+)
+
+func MogiListSelectCustomIDFromString(customID string) MogiListSelectCustomID {
+	switch customID {
+	case string(MogiListSelectCustomIDCan):
+		return MogiListSelectCustomIDCan
+	case string(MogiListSelectCustomIDTemp):
+		return MogiListSelectCustomIDTemp
+	case string(MogiListSelectCustomIDSub):
+		return MogiListSelectCustomIDSub
+	default:
+		return MogiListSelectCustomIDCan
+	}
+}
+
+func (c MogiListSelectCustomID) ToMemberTypes() repository.MemberTypes {
+	switch c {
+	case MogiListSelectCustomIDCan:
+		return repository.MemberTypesParticipant
+	case MogiListSelectCustomIDTemp:
+		return repository.MemberTypesTemporary
+	case MogiListSelectCustomIDSub:
+		return repository.MemberTypesSub
+	default:
+		return repository.MemberTypesParticipant
+	}
+}
