@@ -8,6 +8,7 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
+	"github.com/moeyashi/discord-hands-up-for-sq/usecase"
 )
 
 func HandleLoungeSQInfo(ctx context.Context, s *discordgo.Session, m *discordgo.MessageCreate, repo repository.Repository) {
@@ -24,9 +25,12 @@ func HandleLoungeSQInfo(ctx context.Context, s *discordgo.Session, m *discordgo.
 		return
 	}
 
-	sqList := append(
-		filterSQListForDisplay(guild.SQList, time.Now()),
-		sqListInFuture(m.Content, time.Now())...,
+	now := time.Now()
+
+	sqList := usecase.NewSQList(
+		guild.SQList,
+		sqListInFuture(m.Content, now),
+		now,
 	)
 
 	if err := repo.PutSQList(ctx, guild, sqList); err != nil {
