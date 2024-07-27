@@ -3,6 +3,8 @@ package repository
 import (
 	"context"
 	"time"
+
+	"github.com/bwmarrin/discordgo"
 )
 
 type Repository interface {
@@ -19,6 +21,11 @@ type Repository interface {
 	GetMogiMembers(ctx context.Context, guild *Guild, mogiTitle string) ([]Member, error)
 	PutMogiMembers(ctx context.Context, guild *Guild, mogiTitle string, members []Member) error
 	PutResultsSpreadsheet(ctx context.Context, guild *Guild, spreadsheet string) error
+}
+
+type DiscordRepository interface {
+	FindRoleByName(guildID, roleName string) (*discordgo.Role, error)
+	GuildMemberRoleAdd(guildID, userID, roleID string) error
 }
 
 type LoungeRepository interface {
@@ -68,6 +75,10 @@ var jst = time.FixedZone("Asia/Tokyo", 9*60*60)
 
 func (mogi Mogi) Title() string {
 	return mogi.Timestamp.In(jst).Format("01月02日 15時")
+}
+
+func (mogi Mogi) RoleName() string {
+	return mogi.Title()
 }
 
 func MakeMogi(now time.Time, month, date, hour int64) *Mogi {

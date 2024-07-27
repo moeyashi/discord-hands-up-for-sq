@@ -6,13 +6,14 @@ import (
 	"strings"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/domain/discord"
 	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
-	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
+	"github.com/moeyashi/discord-hands-up-for-sq/repository"
+	"github.com/moeyashi/discord-hands-up-for-sq/usecase"
 )
 
-func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository _repo.Repository) {
-
-	guild, err := repository.GetGuild(ctx, i.GuildID)
+func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repo repository.Repository) {
+	guild, err := repo.GetGuild(ctx, i.GuildID)
 	if err != nil {
 		s.InteractionRespond(i.Interaction, response.MakeErrorInteractionResponse(err))
 		return
@@ -25,61 +26,49 @@ func HandleMogiButtonClick(ctx context.Context, s *discordgo.Session, i *discord
 	}
 
 	mogiTitle := strings.Split(i.MessageComponentData().CustomID, "button_mogi_")[1]
-	mogi, err := repository.GetMogi(ctx, guild, mogiTitle)
+	mogi, err := repo.GetMogi(ctx, guild, mogiTitle)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
-
-	// Mogi Member の取得
-	members, err := repository.GetMogiMembers(ctx, guild, mogiTitle)
-	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
-		return
-	}
+	members := mogi.Members
 
 	// Mogi Memberに追加 or 削除
-	roleName := mogiRoleName(mogi)
-	role, err := findMogiRole(s, i.GuildID, roleName)
-	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
-		return
-	}
-
-	userName := getDisplayUsername(i.Member)
+	userName := discord.GetDisplayUsername(i.Member)
 	responseMessage := ""
 	isExist := false
 	for index, member := range members {
 		if member.UserID == i.Member.User.ID {
+			// 削除
 			isExist = true
-			members = append(members[:index], members[index+1:]...)
 			responseMessage = fmt.Sprintf("%s を %s から外しました。", userName, mogiTitle)
+			roleName := mogi.RoleName()
+			role, err := repository.NewDiscordRepository(s).FindRoleByName(i.GuildID, roleName)
+			if err != nil {
+				s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
+				return
+			}
 			if role != nil {
 				if err := s.GuildMemberRoleRemove(i.GuildID, member.UserID, role.ID); err != nil {
 					s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 					return
 				}
 			}
+			members = append(members[:index], members[index+1:]...)
+			if err := repo.PutMogiMembers(ctx, guild, mogiTitle, members); err != nil {
+				s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
+				return
+			}
 			break
 		}
 	}
 	if !isExist {
-		members = append(members, _repo.Member{
-			UserID:     i.Member.User.ID,
-			UserName:   userName,
-			MemberType: _repo.MemberTypesParticipant,
-		})
+		// 追加
 		responseMessage = fmt.Sprintf("%s を %s に追加しました。", userName, mogiTitle)
-		if role != nil {
-			if err := s.GuildMemberRoleAdd(i.GuildID, i.Member.User.ID, role.ID); err != nil {
-				s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
-				return
-			}
+		if err := usecase.AppendMogiMember(ctx, repo, repository.NewDiscordRepository(s), guild, mogiTitle, i.Member, repository.MemberTypesParticipant); err != nil {
+			s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
+			return
 		}
-	}
-	if err := repository.PutMogiMembers(ctx, guild, mogiTitle, members); err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
-		return
 	}
 
 	// メッセージの作成

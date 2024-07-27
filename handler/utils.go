@@ -142,15 +142,6 @@ func makeSQListEmbedFieldName(
 	return fmt.Sprintf("%s (%s)", sq.Title, strings.Join(members, ", "))
 }
 
-func indexOfSameMember(members []repository.Member, userID string) int {
-	for index, member := range members {
-		if member.UserID == userID {
-			return index
-		}
-	}
-	return -1
-}
-
 func deleteOldMessages(s *discordgo.Session, channelID string) error {
 	messages, err := s.ChannelMessages(channelID, 10, "", "", "")
 	if err != nil {
@@ -169,29 +160,4 @@ func deleteOldMessages(s *discordgo.Session, channelID string) error {
 		}
 	}
 	return nil
-}
-
-func getDisplayUsername(member *discordgo.Member) string {
-	userName := member.Nick
-	if userName == "" {
-		userName = member.User.Username
-	}
-	return userName
-}
-
-func mogiRoleName(mogi *repository.Mogi) string {
-	return fmt.Sprintf("内戦 %s", mogi.Title())
-}
-
-func findMogiRole(s *discordgo.Session, guildID string, mogiRoleName string) (*discordgo.Role, error) {
-	roles, err := s.GuildRoles(guildID)
-	if err != nil {
-		return nil, err
-	}
-	for _, role := range roles {
-		if role.Name == mogiRoleName {
-			return role, nil
-		}
-	}
-	return nil, nil
 }
