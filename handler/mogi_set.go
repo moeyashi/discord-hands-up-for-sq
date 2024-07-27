@@ -36,10 +36,9 @@ func HandleMogiSet(ctx context.Context, s *discordgo.Session, i *discordgo.Inter
 	}
 
 	// discordのロールを作成する
-	// ロール名は「内戦:月/日」
 	mentionable := true
 	_, err = s.GuildRoleCreate(i.GuildID, &discordgo.RoleParams{
-		Name:        mogiRoleName(mogi),
+		Name:        mogi.RoleName(),
 		Mentionable: &mentionable,
 	})
 	if err != nil {

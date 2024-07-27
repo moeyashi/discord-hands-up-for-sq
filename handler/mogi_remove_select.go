@@ -37,8 +37,8 @@ func HandleMogiRemoveSelect(ctx context.Context, s *discordgo.Session, i *discor
 	}
 
 	// discord roleを削除
-	roleName := mogiRoleName(mogi)
-	role, err := findMogiRole(s, i.GuildID, roleName)
+	roleName := mogi.RoleName()
+	role, err := repository.NewDiscordRepository(s).FindRoleByName(i.GuildID, roleName)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return

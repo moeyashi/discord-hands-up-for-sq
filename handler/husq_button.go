@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/domain/discord"
 	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	_repo "github.com/moeyashi/discord-hands-up-for-sq/repository"
 )
@@ -53,7 +54,7 @@ func HandleClick(ctx context.Context, s *discordgo.Session, i *discordgo.Interac
 	}
 
 	// SQ Memberに追加 or 削除
-	userName := getDisplayUsername(i.Member)
+	userName := discord.GetDisplayUsername(i.Member)
 	responseMessage := ""
 	isExist := false
 	for index, member := range members {

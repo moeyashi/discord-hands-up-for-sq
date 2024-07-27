@@ -2,13 +2,14 @@ package handler
 
 import (
 	"context"
-	"errors"
 	"fmt"
 
 	"github.com/bwmarrin/discordgo"
+	"github.com/moeyashi/discord-hands-up-for-sq/domain/discord"
 	"github.com/moeyashi/discord-hands-up-for-sq/handler/constant"
 	"github.com/moeyashi/discord-hands-up-for-sq/handler/response"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
+	"github.com/moeyashi/discord-hands-up-for-sq/usecase"
 )
 
 func HandleMogiCan(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
@@ -58,41 +59,18 @@ func HandleMogiSelect(ctx context.Context, s *discordgo.Session, i *discordgo.In
 		},
 	})
 
+	// 入力データの取得
+	mogiTitle := i.MessageComponentData().Values[0]
 	memberType := constant.MogiListSelectCustomIDFromString(i.MessageComponentData().CustomID).ToMemberTypes()
+
 	guild, err := repo.GetGuild(ctx, i.GuildID)
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
 
-	mogiTitle := i.MessageComponentData().Values[0]
-
-	// Mogi Member の取得
-	members, err := repo.GetMogiMembers(ctx, guild, mogiTitle)
-	if err != nil {
-		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
-		return
-	}
-
-	existsSameIndex := repository.IndexOfSameRegistered(members, i.Member.User.ID, memberType)
-	if existsSameIndex >= 0 {
-		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(errors.New("既に参加しています")))
-		return
-	}
-
 	// Mogi Memberに追加
-	userName := getDisplayUsername(i.Member)
-	existsIndex := indexOfSameMember(members, i.Member.User.ID)
-	if existsIndex >= 0 {
-		// 既に参加している場合は一旦削除
-		members = append(members[:existsIndex], members[existsIndex+1:]...)
-	}
-	members = append(members, repository.Member{
-		UserID:     i.Member.User.ID,
-		UserName:   userName,
-		MemberType: memberType,
-	})
-	if err := repo.PutMogiMembers(ctx, guild, mogiTitle, members); err != nil {
+	if err := usecase.AppendMogiMember(ctx, repo, repository.NewDiscordRepository(s), guild, mogiTitle, i.Member, memberType); err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
@@ -103,7 +81,7 @@ func HandleMogiSelect(ctx context.Context, s *discordgo.Session, i *discordgo.In
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
 		return
 	}
-	responseMessage := fmt.Sprintf("%s を %s に追加しました。", userName, mogiTitle)
+	responseMessage := fmt.Sprintf("%s を %s に追加しました。", discord.GetDisplayUsername(i.Member), mogiTitle)
 	_, err = s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
 		Content:    responseMessage,
 		Embeds:     res.Data.Embeds,
