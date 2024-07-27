@@ -26,7 +26,17 @@ func NewSQList(
 		newSQMap[sq.ID] = sq
 	}
 	for _, sq := range filteredNewSQList {
-		newSQMap[sq.ID] = sq
+		if prev, ok := newSQMap[sq.ID]; ok {
+			newSQMap[sq.ID] = repository.SQ{
+				ID:        sq.ID,
+				Title:     sq.Title,
+				Format:    sq.Format,
+				Timestamp: sq.Timestamp,
+				Members:   prev.Members,
+			}
+		} else {
+			newSQMap[sq.ID] = sq
+		}
 	}
 
 	newSQList = []repository.SQ{}
