@@ -139,6 +139,44 @@ func GetCommands() []*discordgo.ApplicationCommand {
 				},
 			},
 		},
+		{
+			Name:        "mkmg",
+			Description: "MKMG",
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "team",
+					Description: "チーム名を設定します",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Options: []*discordgo.ApplicationCommandOption{
+						{
+							Name:        "name",
+							Description: "チーム名",
+							Type:        discordgo.ApplicationCommandOptionString,
+							Required:    false,
+						},
+					},
+				},
+				{
+					Name:        "post",
+					Description: "mkmgの投稿文を作成します",
+					Type:        discordgo.ApplicationCommandOptionSubCommand,
+					Options: []*discordgo.ApplicationCommandOption{
+						{
+							Name:        "time",
+							Description: "時間（例：21）",
+							Type:        discordgo.ApplicationCommandOptionString,
+							Required:    true,
+						},
+						{
+							Name:        "avg",
+							Description: "平均（例：5000）",
+							Type:        discordgo.ApplicationCommandOptionInteger,
+							Required:    true,
+						},
+					},
+				},
+			},
+		},
 	}
 }
 

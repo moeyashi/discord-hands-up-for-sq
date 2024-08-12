@@ -10,6 +10,7 @@ import (
 type Repository interface {
 	GetVersion(ctx context.Context) (*version, error)
 	GetGuild(ctx context.Context, guildID string) (*Guild, error)
+	PutGuildName(ctx context.Context, guildID string, name string) (*Guild, error)
 	GetSQList(ctx context.Context, guild *Guild) ([]SQ, error)
 	PutSQList(ctx context.Context, guild *Guild, sqList []SQ) error
 	GetMogiList(ctx context.Context, guild *Guild) ([]Mogi, error)
@@ -69,6 +70,7 @@ type Guild struct {
 	SQList      []SQ   `firestore:"sqList"`
 	Spreadsheet string `firestore:"spreadsheet"`
 	MogiList    []Mogi `firestore:"mogiList"`
+	Name        string `firestore:"name"`
 }
 
 var jst = time.FixedZone("Asia/Tokyo", 9*60*60)

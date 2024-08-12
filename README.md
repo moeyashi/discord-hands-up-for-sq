@@ -33,6 +33,13 @@ go run main.go -guild GUILD_ID
 
 ### デプロイ
 
+#### commands
+
+```bash
+$env:BOT_TOKEN="[YOUR BOT TOKEN]"
+go run ./deploy-commands/main.go
+```
+
 #### Fly.io
 
 fly.tomlの用意
