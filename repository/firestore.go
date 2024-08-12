@@ -65,6 +65,19 @@ func (r *firestoreRepository) GetGuild(ctx context.Context, guildID string) (*Gu
 	return guild, nil
 }
 
+func (r *firestoreRepository) PutGuildName(ctx context.Context, guildID string, name string) (*Guild, error) {
+	guild, err := r.getGuildOrCreate(ctx, guildID)
+	if err != nil {
+		return nil, err
+	}
+	guild.Name = name
+	_, err = r.getGuildDocRef(guildID).Set(ctx, guild)
+	if err != nil {
+		return nil, err
+	}
+	return guild, nil
+}
+
 func (r *firestoreRepository) GetSQList(ctx context.Context, guild *Guild) ([]SQ, error) {
 	return guild.SQList, nil
 }

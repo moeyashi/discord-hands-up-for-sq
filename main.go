@@ -110,6 +110,17 @@ var (
 				return
 			}
 		},
+		"mkmg": func(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
+			options := i.ApplicationCommandData().Options
+			switch options[0].Name {
+			case "team":
+				handler.HandleMKMGTeam(ctx, s, i, repository)
+				return
+			case "post":
+				handler.HandleMKMGPost(ctx, s, i, repository)
+				return
+			}
+		},
 	}
 )
 
