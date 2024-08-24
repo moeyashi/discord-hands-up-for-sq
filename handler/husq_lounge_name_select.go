@@ -33,6 +33,11 @@ func HandleLoungeNameSelect(ctx context.Context, s *discordgo.Session, i *discor
 		return
 	}
 
+	if len(members) == 0 {
+		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(fmt.Errorf("SQメンバーが見つかりませんでした")))
+		return
+	}
+
 	loungeRepo, err := repository.NewLoungeRepository()
 	if err != nil {
 		s.FollowupMessageCreate(i.Interaction, true, response.MakeErrorWebhookParams(err))
