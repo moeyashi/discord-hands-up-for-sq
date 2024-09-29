@@ -150,12 +150,17 @@ func extractEnemyName(title string) string {
 
 func extractResults(fields []*discordgo.MessageEmbedField) ([12]result, error) {
 	var results [12]result
+	ignoreRows := 0
 	for i, field := range fields {
+		if strings.Contains(field.Name, "Repick") || strings.Contains(field.Name, "repick") {
+			ignoreRows++
+			continue
+		}
 		places, err := extractPlaces(field.Value)
 		if err != nil {
 			return results, err
 		}
-		results[i] = result{
+		results[i-ignoreRows] = result{
 			TrackName: extractTrackName(field.Name),
 			Places:    places,
 		}
