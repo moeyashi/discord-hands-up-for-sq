@@ -21,15 +21,15 @@ jobs:
       # firebase-toolsのインストール
       # 参考
       # https://qiita.com/nukotsuka/items/3384ad7e6c4a429b2032
+      - name: Cache firebase emulators
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/firebase/emulators
+          key: ${{ runner.os }}-firebase-emulators-${{ env.FIREBASE_VIRSION }}
       - name: Install firebase-tools
         run: |
           yarn global add firebase-tools
           echo "FIREBASE_VIRSION=$(firebase --version)" >> $GITHUB_ENV
-      - name: Cache firebase emulators
-        uses: actions/cache@v3
-        with:
-          path: ~/.cache/firebase/emulators
-          key: ${{ runner.os }}-firebase-emulators-${{ env.FIREBASE_VIRSION }}
 
       # test
       - run: firebase emulators:exec --project test 'go test ./...'
