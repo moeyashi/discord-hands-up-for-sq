@@ -133,6 +133,10 @@ func makeSampleMessage() *discordgo.Message {
 					Value: "`37 : 45(-8)` | `3,4,5,8,9,12`",
 				},
 				{
+					Name:  "Repick",
+					Value: "`0 : -15`",
+				},
+				{
 					Name:  "5  - <:rDKJ:968803704130117672> ジャングル",
 					Value: "`31 : 51(-20)` | `4,6,7,9,10,11`",
 				},
