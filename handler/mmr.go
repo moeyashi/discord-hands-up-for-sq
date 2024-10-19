@@ -50,12 +50,12 @@ func HandleMMR(ctx context.Context, s *discordgo.Session, i *discordgo.Interacti
 		// Discordのユーザー名を取得
 		nameForLounge, err := loungeRepo.GetLoungeName(ctx, member.User.ID)
 		if err != nil || nameForLounge == nil || nameForLounge.MMR == 0 {
-			res.Embeds[(i+1)/25].Fields = append(res.Embeds[(i+1)/25].Fields, &discordgo.MessageEmbedField{
+			res.Embeds[(i)/25].Fields = append(res.Embeds[(i)/25].Fields, &discordgo.MessageEmbedField{
 				Name:  discord.GetDisplayUsername(member),
 				Value: "MMRが取得できませんでした",
 			})
 		} else {
-			res.Embeds[(i+1)/25].Fields = append(res.Embeds[(i+1)/25].Fields, &discordgo.MessageEmbedField{
+			res.Embeds[(i)/25].Fields = append(res.Embeds[(i)/25].Fields, &discordgo.MessageEmbedField{
 				Name:  discord.GetDisplayUsername(member),
 				Value: strconv.Itoa(nameForLounge.MMR),
 			})
