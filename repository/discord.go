@@ -36,3 +36,20 @@ func (r *discordRepository) FindRoleByName(guildID string, roleName string) (*di
 func (r *discordRepository) GuildMemberRoleAdd(guildID, userID, roleID string) error {
 	return r.s.GuildMemberRoleAdd(guildID, userID, roleID)
 }
+
+func (r *discordRepository) GuildMemberByRole(guildID, roleID string) ([]*discordgo.Member, error) {
+	members, err := r.s.GuildMembers(guildID, "", 100)
+	if err != nil {
+		return nil, err
+	}
+	var ret []*discordgo.Member
+	for _, member := range members {
+		for _, role := range member.Roles {
+			if role == roleID {
+				ret = append(ret, member)
+				break
+			}
+		}
+	}
+	return ret, nil
+}
