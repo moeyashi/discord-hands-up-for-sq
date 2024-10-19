@@ -121,6 +121,7 @@ var (
 				return
 			}
 		},
+		"mmr": handler.HandleMMR,
 	}
 )
 

@@ -50,6 +50,19 @@ func GetCommands() []*discordgo.ApplicationCommand {
 			Type: discordgo.MessageApplicationCommand,
 		},
 		{
+			Name:        "mmr",
+			Description: "ロールを持つメンバーのMMRを表示します",
+			Type:        discordgo.ChatApplicationCommand,
+			Options: []*discordgo.ApplicationCommandOption{
+				{
+					Name:        "role",
+					Description: "ロール名",
+					Type:        discordgo.ApplicationCommandOptionRole,
+					Required:    true,
+				},
+			},
+		},
+		{
 			Name:        "mogi",
 			Description: "Hands up for civil war",
 			Options: []*discordgo.ApplicationCommandOption{

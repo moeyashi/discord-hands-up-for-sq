@@ -14,6 +14,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Invalid bot parameters: %v", err)
 	}
+	defer s.Close()
 	s.AddHandler(func(s *discordgo.Session, r *discordgo.Ready) {
 		log.Printf("Logged in as: %v#%v", s.State.User.Username, s.State.User.Discriminator)
 	})
@@ -27,22 +28,38 @@ func main() {
 	if err != nil {
 		log.Fatalf("Could not fetch registered commands: %v", err)
 	}
-	for _, v := range registeredCommands {
-		err := s.ApplicationCommandDelete(s.State.User.ID, "", v.ID)
-		if err != nil {
-			log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
-		}
-	}
+	// for _, v := range registeredCommands {
+	// 	err := s.ApplicationCommandDelete(s.State.User.ID, "", v.ID)
+	// 	if err != nil {
+	// 		log.Panicf("Cannot delete '%v' command: %v", v.Name, err)
+	// 	}
+	// }
 
 	log.Println("Adding commands...")
 	for _, v := range commands.GetCommands() {
+		existsCommand := false
+		for _, prev := range registeredCommands {
+			if prev.Name == v.Name {
+				existsCommand = true
+				log.Println("Editing command:", v.Name)
+				_, err := s.ApplicationCommandEdit(s.State.User.ID, "", prev.ID, v)
+				if err != nil {
+					log.Printf("Cannot edit '%v' command: %v", v.Name, err)
+				}
+				break
+			}
+		}
+
+		if existsCommand {
+			continue
+		}
+
+		log.Println("Creating command:", v.Name)
 		_, err := s.ApplicationCommandCreate(s.State.User.ID, "", v)
 		if err != nil {
-			log.Panicf("Cannot create '%v' command: %v", v.Name, err)
+			log.Printf("Cannot create '%v' command: %v", v.Name, err)
 		}
 	}
-
-	defer s.Close()
 
 	log.Println("Gracefully shutting down.")
 }

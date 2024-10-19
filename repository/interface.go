@@ -27,6 +27,7 @@ type Repository interface {
 type DiscordRepository interface {
 	FindRoleByName(guildID, roleName string) (*discordgo.Role, error)
 	GuildMemberRoleAdd(guildID, userID, roleID string) error
+	GuildMemberByRole(guildID, roleID string) ([]*discordgo.Member, error)
 }
 
 type LoungeRepository interface {
