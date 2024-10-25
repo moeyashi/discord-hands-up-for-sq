@@ -9,7 +9,6 @@ import (
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
-	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
@@ -57,8 +56,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 		return
 	}
 
-	credential := option.WithCredentialsFile("./google-api-credential.json")
-	srv, err := sheets.NewService(ctx, credential)
+	srv, err := sheets.NewService(ctx)
 	if err != nil {
 		fmt.Println(err)
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
