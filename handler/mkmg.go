@@ -82,6 +82,6 @@ func HandleMKMGPost(ctx context.Context, s *discordgo.Session, i *discordgo.Inte
 	}
 
 	s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
-		Content: fmt.Sprintf("%s時交流戦お相手募集\nこちら%s、平均%d\n主催可能、ID開設\n#mkmg", time, guild.Name, avg),
+		Content: fmt.Sprintf("%s交流戦お相手募集\nこちら%s、平均%d\n主催可能、ID開設\n平均を添えてリプをお願いします\n#mkmg", time, guild.Name, avg),
 	})
 }
