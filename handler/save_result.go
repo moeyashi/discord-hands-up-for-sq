@@ -3,18 +3,16 @@ package handler
 import (
 	"context"
 	"fmt"
-	"os"
 	"strconv"
 	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
 	"github.com/moeyashi/discord-hands-up-for-sq/repository"
-	"google.golang.org/api/option"
 	"google.golang.org/api/sheets/v4"
 )
 
-func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repository repository.Repository) {
+func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.InteractionCreate, repo repository.Repository) {
 	if err := s.InteractionRespond(i.Interaction, &discordgo.InteractionResponse{
 		Type: discordgo.InteractionResponseDeferredChannelMessageWithSource,
 	}); err != nil {
@@ -36,7 +34,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 		return
 	}
 
-	guild, err := repository.GetGuild(ctx, i.GuildID)
+	guild, err := repo.GetGuild(ctx, i.GuildID)
 	if err != nil {
 		fmt.Println(err)
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
@@ -58,9 +56,7 @@ func HandleSaveResult(ctx context.Context, s *discordgo.Session, i *discordgo.In
 		return
 	}
 
-	credentialJSON := os.Getenv("GOOGLE_APPLICATION_CREDENTIALS")
-	option.WithCredentialsJSON([]byte(credentialJSON))
-	srv, err := sheets.NewService(ctx, option.WithCredentialsJSON([]byte(credentialJSON)))
+	srv, err := sheets.NewService(ctx, repository.GetGoogleDefaultCredentialClientOption())
 	if err != nil {
 		fmt.Println(err)
 		if _, err := s.FollowupMessageCreate(i.Interaction, true, &discordgo.WebhookParams{
