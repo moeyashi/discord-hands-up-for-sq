@@ -7,7 +7,4 @@ processes = []
   builder = "paketobuildpacks/builder-jammy-base"
   buildpacks = ["gcr.io/paketo-buildpacks/go"]
 
-[build.args]
-  BP_KEEP_FILES = "google-api-credential.json"
-
 [env]
