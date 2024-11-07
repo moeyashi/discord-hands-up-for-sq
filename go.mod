@@ -7,13 +7,13 @@ toolchain go1.23.0
 require (
 	cloud.google.com/go/firestore v1.17.0
 	github.com/bwmarrin/discordgo v0.28.1
-	google.golang.org/api v0.204.0
+	google.golang.org/api v0.205.0
 	google.golang.org/grpc v1.67.1
 )
 
 require (
 	cloud.google.com/go v0.116.0 // indirect
-	cloud.google.com/go/auth v0.10.0 // indirect
+	cloud.google.com/go/auth v0.10.1 // indirect
 	cloud.google.com/go/auth/oauth2adapt v0.2.5 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	cloud.google.com/go/longrunning v0.6.1 // indirect
