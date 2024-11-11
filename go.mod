@@ -1,6 +1,7 @@
 module github.com/moeyashi/discord-hands-up-for-sq
 
-go 1.22
+go 1.22.7
+
 toolchain go1.23.0
 
 require (
