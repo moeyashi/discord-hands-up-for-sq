@@ -7,7 +7,7 @@ toolchain go1.23.0
 require (
 	cloud.google.com/go/firestore v1.17.0
 	github.com/bwmarrin/discordgo v0.28.1
-	google.golang.org/api v0.212.0
+	google.golang.org/api v0.213.0
 	google.golang.org/grpc v1.69.0
 )
 
@@ -41,6 +41,6 @@ require (
 	golang.org/x/time v0.8.0 // indirect
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20241118233622-e639e219e697 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241206012308-a4fef0638583 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241209162323-e6fa225c2576 // indirect
 	google.golang.org/protobuf v1.35.2 // indirect
 )
