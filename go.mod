@@ -1,6 +1,7 @@
 module github.com/moeyashi/discord-hands-up-for-sq
 
-go 1.22.7
+go 1.23.0
+
 require (
 	cloud.google.com/go/firestore v1.18.0
 	github.com/bwmarrin/discordgo v0.28.1
