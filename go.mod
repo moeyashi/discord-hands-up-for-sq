@@ -5,7 +5,7 @@ go 1.23.0
 require (
 	cloud.google.com/go/firestore v1.18.0
 	github.com/bwmarrin/discordgo v0.28.1
-	google.golang.org/api v0.225.0
+	google.golang.org/api v0.226.0
 	google.golang.org/grpc v1.71.0
 )
 
