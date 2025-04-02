@@ -2,11 +2,13 @@ module github.com/moeyashi/discord-hands-up-for-sq
 
 go 1.23.0
 
+toolchain go1.24.1
+
 require (
 	cloud.google.com/go/firestore v1.18.0
 	github.com/bwmarrin/discordgo v0.28.1
 	google.golang.org/api v0.228.0
-	google.golang.org/grpc v1.71.0
+	google.golang.org/grpc v1.71.1
 )
 
 require (
