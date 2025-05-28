@@ -5,6 +5,6 @@ processes = []
 
 [build]
   builder = "paketobuildpacks/builder-jammy-base"
-  buildpacks = ["gcr.io/paketo-buildpacks/go"]
+  buildpacks = ["paketo-buildpacks/go"]
 
 [env]
