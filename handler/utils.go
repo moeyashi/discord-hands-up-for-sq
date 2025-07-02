@@ -20,7 +20,7 @@ func sqListInFuture(sqInfo string, now time.Time) []repository.SQ {
 		return []repository.SQ{}
 	}
 	nowUnix := now.Unix()
-	re := regexp.MustCompile("`#(\\d+)` \\*\\*(\\dv\\d):\\*\\* <t:(\\d+):F>")
+	re := regexp.MustCompile("`#(\\d+)` \\*\\*.*(\\dv\\d):\\*\\* <t:(\\d+):F>")
 	results := re.FindAllStringSubmatch(sqInfo, -1)
 	sqList := []repository.SQ{}
 	for _, submatches := range results {
@@ -45,7 +45,7 @@ func createSetCommandsInFuture(sqInfo string, now time.Time) []string {
 		return []string{}
 	}
 	nowUnix := now.Unix()
-	re := regexp.MustCompile("`#(\\d+)` \\*\\*(\\dv\\d):\\*\\* <t:(\\d+):F>")
+	re := regexp.MustCompile("`#(\\d+)` \\*\\*.*(\\dv\\d):\\*\\* <t:(\\d+):F>")
 	results := re.FindAllStringSubmatch(sqInfo, -1)
 	commands := []string{}
 	for _, submatches := range results {
