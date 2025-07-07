@@ -7,7 +7,7 @@ toolchain go1.24.1
 require (
 	cloud.google.com/go/firestore v1.18.0
 	github.com/bwmarrin/discordgo v0.29.0
-	google.golang.org/api v0.239.0
+	google.golang.org/api v0.240.0
 	google.golang.org/grpc v1.73.0
 )
 
