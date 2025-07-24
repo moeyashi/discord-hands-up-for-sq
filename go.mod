@@ -8,7 +8,7 @@ require (
 	cloud.google.com/go/firestore v1.18.0
 	github.com/bwmarrin/discordgo v0.29.0
 	google.golang.org/api v0.242.0
-	google.golang.org/grpc v1.74.0
+	google.golang.org/grpc v1.74.2
 )
 
 require (
