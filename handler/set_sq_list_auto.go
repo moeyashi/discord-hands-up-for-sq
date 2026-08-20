@@ -19,6 +19,8 @@ func HandleLoungeSQInfo(ctx context.Context, s *discordgo.Session, m *discordgo.
 		return
 	}
 
+	log.Printf("sq-list自動更新 処理開始 serverId: %v", m.GuildID)
+
 	guild, err := repo.GetGuild(ctx, m.GuildID)
 	if err != nil {
 		handleLoungeSQInfoError(s, m, err)
