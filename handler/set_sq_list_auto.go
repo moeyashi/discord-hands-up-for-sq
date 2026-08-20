@@ -16,6 +16,9 @@ func HandleLoungeSQInfo(ctx context.Context, s *discordgo.Session, m *discordgo.
 		return
 	}
 	if m.Author.Username != "MK8DX 150cc Lounge #sq-info" || m.Author.Discriminator != "0000" {
+		if m.Author.Username == "MK8DX 150cc Lounge #sq-info" || m.Author.Discriminator == "0000" {
+			log.Printf("sq-list自動更新 無視 serverId: %v, ユーザー名: %v, Discriminator: %v", m.GuildID, m.Author.Username, m.Author.Discriminator)
+		}
 		return
 	}
 
