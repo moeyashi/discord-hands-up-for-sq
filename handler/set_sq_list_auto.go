@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/bwmarrin/discordgo"
@@ -15,8 +16,8 @@ func HandleLoungeSQInfo(ctx context.Context, s *discordgo.Session, m *discordgo.
 	if m.Author.ID == s.State.User.ID {
 		return
 	}
-	if m.Author.Username != "MK8DX 150cc Lounge #sq-info" || m.Author.Discriminator != "0000" {
-		if m.Author.Username == "MK8DX 150cc Lounge #sq-info" || m.Author.Discriminator == "0000" {
+	if !strings.HasPrefix(m.Author.Username, "MK8DX 150cc Lounge") || m.Author.Discriminator != "0000" {
+		if strings.HasPrefix(m.Author.Username, "MK8DX 150cc Lounge") || m.Author.Discriminator == "0000" {
 			log.Printf("sq-list自動更新 無視 serverId: %v, ユーザー名: %v, Discriminator: %v", m.GuildID, m.Author.Username, m.Author.Discriminator)
 		}
 		return
