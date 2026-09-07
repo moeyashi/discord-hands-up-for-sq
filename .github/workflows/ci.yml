@@ -30,7 +30,7 @@ jobs:
           yarn global add firebase-tools
           echo "FIREBASE_VIRSION=$(firebase --version)" >> $GITHUB_ENV
       - name: Cache firebase emulators
-        uses: actions/cache@v4
+        uses: actions/cache@v6
         with:
           path: ~/.cache/firebase/emulators
           key: ${{ runner.os }}-firebase-emulators-${{ env.FIREBASE_VIRSION }}
