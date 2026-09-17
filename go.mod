@@ -3,7 +3,7 @@ module github.com/moeyashi/discord-hands-up-for-sq
 go 1.26.0
 
 require (
-	cloud.google.com/go/firestore v1.24.0
+	cloud.google.com/go/firestore v1.25.0
 	github.com/bwmarrin/discordgo v0.29.0
 	google.golang.org/api v0.297.0
 	google.golang.org/grpc v1.83.2
